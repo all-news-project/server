@@ -1,2 +1,14 @@
 # server
+
 All News Project Server Side
+
+> Server Components:
+
+| Component            | Description                                                                                                                                                                                                                                                                                                                                   |
+|----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ```REST API```       | Python flask REST API that will be connected to the Database and get the articles by different filters, in addition the API will have a component that will be connected to the Database and by given article URL it will check if there are more stored articles in the Database with the same subject that the NLP model already classified |
+| ```Scheduler```      | Scheduling the Scraping tasks that will collect data / articles from websites (Batch system)                                                                                                                                                                                                                                                  |
+| ```Scraping```       | Taking pending tasks from the Database and collect articles using python selenium web scraping                                                                                                                                                                                                                                                |
+| ```Database```       | Store all the articles and the collecting tasks                                                                                                                                                                                                                                                                                               |
+| ```NLP MODEL```      | To classify articles into clusters (same articles subjects)                                                                                                                                                                                                                                                                                   |
+| ```NLP SUMMARIZER``` | Summarize the articles content                                                                                                                                                                                                                                                                                                                |
