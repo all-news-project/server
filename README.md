@@ -1,6 +1,4 @@
-# server
-
-All News Project Server Side
+# All News Project Server Side
 
 > Server Components:
 
