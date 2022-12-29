@@ -3,7 +3,7 @@ from functools import cache
 from uuid import uuid4
 
 from db_utils.db_objects.article import Article
-from db_utils.mongodb_utils import MongoDBUtils
+from db_utils.mongodb_utils import DBUtils
 
 
 @cache
@@ -12,7 +12,7 @@ def get_current_db_driver():
     Singleton db driver
     :return:
     """
-    return MongoDBUtils()
+    return DBUtils()
 
 
 if __name__ == '__main__':
@@ -29,6 +29,8 @@ if __name__ == '__main__':
     #     article_id=article_id, url=url, website=website, title=title, content=content, publishing_time=publishing_time,
     #     collecting_time=collecting_time
     # )
-    # db_utils.insert(table_name='articles', data=test_article.convert_to_dict())
-    data = db_utils.get_one(table_name='articles', data_filter={'article_id': '05504dac-cb0f-410c-bce4-713482a59e42'})
-    print(data)
+    # db_utils.insert_one(table_name='articles', data=test_article.convert_to_dict())
+    # data = db_utils.get_one(table_name='articles', data_filter={'article_id': '05504dac-cb0f-410c-bce4-713482a59e42'})
+    # print(data)
+
+    db_utils.delete_one(table_name='articles', data_filter={'article_id': '211c5ad8-9a65-48ca-a374-2bbb882f2934'})
