@@ -6,7 +6,7 @@ from pymongo import MongoClient
 
 from db_utils.exceptions import DataNotFoundDBException, InsertDataDBException, DeleteDataDBException
 from db_utils.interface_db_utils import DBUtilsInterface
-from kg_logger import KGLogger, log_function
+from server_logger import get_current_logger, log_function
 
 
 class DBUtils(DBUtilsInterface):
@@ -15,7 +15,7 @@ class DBUtils(DBUtilsInterface):
     DB_URL = os.getenv(key='DB_URL')
 
     def __init__(self):
-        self.logger = KGLogger()
+        self.logger = get_current_logger()
         client = MongoClient(f'mongodb+srv://allnews:{self.DB_PASSWORD}@{self.DB_URL}')
         self._db = client[self.DB_NAME]
         self.logger.debug(f"Connected to mongodb ")
