@@ -3,10 +3,10 @@ from typing import List
 
 from bson import ObjectId
 from pymongo import MongoClient
+from wise_logger import get_current_logger, log_function
 
 from db_utils.exceptions import DataNotFoundDBException, InsertDataDBException, DeleteDataDBException
 from db_utils.interface_db_utils import DBUtilsInterface
-from server_logger import get_current_logger, log_function
 
 
 class DBUtils(DBUtilsInterface):
