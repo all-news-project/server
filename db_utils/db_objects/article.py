@@ -1,6 +1,6 @@
 import datetime
 from dataclasses import dataclass, asdict
-from typing import List
+from typing import List, Optional
 
 
 @dataclass
@@ -12,20 +12,15 @@ class Article:
     content: str
     publishing_time: datetime.datetime
     collecting_time: datetime.datetime
-    category: str = None
-    images: List[str] = None
-    state: str = None
+    category: Optional[str] = None
+    images: Optional[List[str]] = None
+    state: Optional[str] = None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         string = ''
-        for attribute in [a for a in dir(self) if not a.startswith('__')]:
-            string += f"{attribute}: {self.__getattribute__(attribute)}\n"
+        for prop, value in vars(self).items():
+            string += f"{str(prop)}: {str(value)}\n"
         return string
 
-    def convert_to_dict(self):
+    def convert_to_dict(self) -> dict:
         return asdict(self)
-
-
-def get_article_from_dict(article_dict: dict) -> Article:
-    article = Article(**article_dict)
-    return article

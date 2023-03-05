@@ -3,10 +3,10 @@ from typing import List
 
 from bson import ObjectId
 from pymongo import MongoClient
+from wise_logger import get_current_logger, log_function
 
 from db_utils.exceptions import DataNotFoundDBException, InsertDataDBException, DeleteDataDBException
 from db_utils.interface_db_utils import DBUtilsInterface
-from kg_logger import KGLogger, log_function
 
 
 class DBUtils(DBUtilsInterface):
@@ -15,10 +15,16 @@ class DBUtils(DBUtilsInterface):
     DB_URL = os.getenv(key='DB_URL')
 
     def __init__(self):
-        self.logger = KGLogger()
-        client = MongoClient(f'mongodb+srv://allnews:{self.DB_PASSWORD}@{self.DB_URL}')
+        self.logger = get_current_logger()
+        self._check_password_and_db_name_validation()
+        client = MongoClient(f"mongodb+srv://allnews:{self.DB_PASSWORD}@{self.DB_URL}")
         self._db = client[self.DB_NAME]
         self.logger.debug(f"Connected to mongodb ")
+
+    @log_function
+    def _check_password_and_db_name_validation(self):
+        if not self.DB_PASSWORD or not self.DB_URL:
+            raise ValueError(f"Cannot connect to db when DB_PASSWORD or DB_URL are None value or empty string")
 
     @log_function
     def insert_one(self, table_name: str, data: dict) -> ObjectId:
