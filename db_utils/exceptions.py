@@ -11,3 +11,8 @@ class InsertDataDBException(Exception):
 class DeleteDataDBException(Exception):
     def __init__(self, msg: str):
         self.msg = msg
+
+
+class UpdateDataDBException(Exception):
+    def __init__(self, msg: str):
+        self.msg = msg
