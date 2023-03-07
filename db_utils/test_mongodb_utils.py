@@ -106,3 +106,39 @@ class TestMongoDBUtils(TestCase):
         except Exception as e:
             print(f"test_delete_many: {e}")
             self.fail()
+
+    def test_exists(self):
+        try:
+            db_utils = get_current_db_driver()
+            _id = self.test_insert_one()
+            data_filter = {'article_id': _id}
+            flag = db_utils.exists(table_name='articles', data_filter=data_filter)
+            if not flag:
+                self.fail()
+        except Exception as e:
+            print(f"test_delete_one: {e}")
+            self.fail()
+
+    def test_count(self):
+        try:
+            db_utils = get_current_db_driver()
+            _id = self.test_insert_many()
+            data_filter = {'article_id': _id}
+            flag = db_utils.count(table_name='articles', data_filter=data_filter)
+            if flag == 0:
+                self.fail()
+        except Exception as e:
+            print(f"test_delete_one: {e}")
+            self.fail()
+
+    # def test_update_one(self):
+    #     try:
+    #         db_utils = get_current_db_driver()
+    #         _id = self.test_insert_one()
+    #         data_filter = {'article_id': _id}
+    #         flag = db_utils.update_one(table_name='articles', data_filter=data_filter)
+    #         if not flag:
+    #             self.fail()
+    #     except Exception as e:
+    #         print(f"test_delete_one: {e}")
+    #         self.fail()
