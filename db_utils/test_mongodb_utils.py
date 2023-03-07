@@ -1,9 +1,8 @@
 from datetime import datetime
 from unittest import TestCase
-from uuid import uuid4
 
 from db_utils import get_current_db_driver, Article
-from db_utils.db_objects.article import get_article_from_dict
+from db_utils.db_objects.db_objects_utils import get_db_object_from_dict
 
 
 class TestMongoDBUtils(TestCase):
@@ -34,15 +33,13 @@ class TestMongoDBUtils(TestCase):
     def test_get_one(self):
         try:
             db_utils = get_current_db_driver()
-            data_filter = {'article_id': 'article_test_id'}
+            data_filter = {'article_id': '05504dac-cb0f-410c-bce4-713482a59e42'}
             article_dict = db_utils.get_one(table_name='articles', data_filter=data_filter)
             if not article_dict:
                 self.fail()
-            article = get_article_from_dict(article_dict)
+            article = get_db_object_from_dict(object_dict=article_dict, class_instance=Article)
             print(article)
 
         except Exception as e:
             print(f"test_insert_one: {e}")
             self.fail()
-
-

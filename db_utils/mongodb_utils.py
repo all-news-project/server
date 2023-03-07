@@ -16,9 +16,15 @@ class DBUtils(DBUtilsInterface):
 
     def __init__(self):
         self.logger = get_current_logger()
-        client = MongoClient(f'mongodb+srv://allnews:{self.DB_PASSWORD}@{self.DB_URL}')
+        self._check_password_and_db_name_validation()
+        client = MongoClient(f"mongodb+srv://allnews:{self.DB_PASSWORD}@{self.DB_URL}")
         self._db = client[self.DB_NAME]
         self.logger.debug(f"Connected to mongodb ")
+
+    @log_function
+    def _check_password_and_db_name_validation(self):
+        if not self.DB_PASSWORD or not self.DB_URL:
+            raise ValueError(f"Cannot connect to db when DB_PASSWORD or DB_URL are None value or empty string")
 
     @log_function
     def insert_one(self, table_name: str, data: dict) -> ObjectId:
