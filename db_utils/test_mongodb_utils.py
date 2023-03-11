@@ -131,7 +131,9 @@ class TestMongoDBUtils(TestCase):
             print(f"test_delete_one: {e}")
             self.fail()
 
-    # def test_update_one(self):
+    def test_update_one(self):
+        # TODO: create test for update one
+        pass
     #     try:
     #         db_utils = get_current_db_driver()
     #         _id = self.test_insert_one()
