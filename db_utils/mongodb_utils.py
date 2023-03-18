@@ -3,11 +3,11 @@ from typing import List
 
 from bson import ObjectId
 from pymongo import MongoClient
-from wise_logger import get_current_logger, log_function
 
 from db_utils.exceptions import DataNotFoundDBException, InsertDataDBException, DeleteDataDBException, \
     UpdateDataDBException
 from db_utils.interface_db_utils import DBUtilsInterface
+from logger import get_current_logger, log_function
 
 
 class DBUtils(DBUtilsInterface):
@@ -191,7 +191,6 @@ class DBUtils(DBUtilsInterface):
         except Exception as e:
             self.logger.error(f"Error counting from db: {str(e)}")
             return False
-        pass
 
     @log_function
     def get_many(self, table_name: str, data_filter: dict) -> List[dict]:
@@ -209,4 +208,3 @@ class DBUtils(DBUtilsInterface):
         except Exception as e:
             self.logger.error(f"Error get many from db - {str(e)}")
             raise e
-
