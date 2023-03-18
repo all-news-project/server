@@ -1,3 +1,3 @@
-git+https://github.com/wise-tools/wise-logger@main
 pymongo~=4.3.3
 selenium~=4.5.0
+setuptools==65.5.1
