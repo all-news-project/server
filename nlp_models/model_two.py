@@ -64,7 +64,7 @@ class genis:
         processed_text2 = self._preprocess(text2)
         dictionary = gensim.corpora.Dictionary([processed_text1, processed_text2])
         corpus = [dictionary.doc2bow(text) for text in [processed_text1, processed_text2]]
-        lda_model = gensim.models.LdaModel(corpus, num_topics=1, id2word=dictionary, passes=10)
+        lda_model = gensim.models.LdaModel(corpus, num_topics=2, id2word=dictionary, passes=10)
         topics1 = set([word for word, _ in lda_model.get_topic_terms(0, topn=10)])
         topics2 = set([word for word, _ in lda_model.get_topic_terms(1, topn=10)])
         common_topics = topics1.intersection(topics2)
