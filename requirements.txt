@@ -1,3 +1,6 @@
 git+https://github.com/wise-tools/wise-logger@main
 pymongo~=4.3.3
 selenium~=4.5.0
+transformers~=4.27.1
+gensim~=4.3.1
+nltk~=3.8.1
