@@ -2,13 +2,13 @@ import requests
 from bs4 import BeautifulSoup
 
 from logger import get_current_logger
-from scrapers.scraper_component.exceptions import PageNotFoundException
-from scrapers.scraper_component.request_driver_interface import RequestDriverInterface
+from scrapers.scraper_component.utils.exceptions import PageNotFoundException
+from scrapers.scraper_component.interfaces.base_driver_interface import BaseDriverInterface
 
 from typing import List
 
 
-class RequestsDriver(RequestDriverInterface):
+class RequestsDriver(BaseDriverInterface):
     def __init__(self):
         self.logger = get_current_logger()
         self.url = None
@@ -34,8 +34,12 @@ class RequestsDriver(RequestDriverInterface):
     def get_title(self) -> str:
         return self._current_soup_page.title.text
 
-    def find_element(self, by, value, tag_name: str = None):
-        return self._current_soup_page.find(name=tag_name, attrs={by: value})
+    def find_element(self, by, value):
+        # return self._current_soup_page.find(name=tag_name, attrs={by: value})
+        pass
+
+    def find_elements(self, by, value):
+        pass
 
 
 if __name__ == '__main__':
