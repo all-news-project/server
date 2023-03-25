@@ -4,6 +4,8 @@
 
 # Copy code
 import transformers
+from sentence_transformers import SentenceTransformer
+import numpy as np
 
 
 # Load the BERT model
@@ -31,14 +33,17 @@ import transformers
 
 # You can adjust the parameters of the BERT model and the similarity calculation to fine-tune the results to your specific needs. Additionally, you may want to use other NLP techniques, such as keyword extraction or text summarization, to further analyze the texts and determine their similarity.
 
-class Bert:
-    def __init__(self, tokenizer=transformers.BatchEncoding()):
-        self.tokenizer = tokenizer
-        self.model = transformers.BertModel.from_pretrained("bert-base-uncased")
+class nlp_similizer:
+    def __init__(self):
+        self.model = SentenceTransformer('sentence-transformers/all-mpnet-base-v1')
 
+        # print(d)
+        # self.model = transformers.BertModel.from_pretrained("bert-base-uncased")
 
-    def similarity(self, text1, text2, maxlen):
-        inputs = self.tokenizer.encode_plus(text1, text2, return_tensors="pt", max_length=maxlen)
-        outputs = self.model(**inputs)
-        similarity_score = outputs[0][0][0].item()
-        return similarity_score
+    def similarity(self, sentences):
+        embeddings = self.model.encode(sentences)
+        return np.dot(embeddings[0], embeddings[1], out=None)*100
+        # inputs = self.tokenizer.encode_plus(text1, text2, return_tensors="pt", max_length=maxlen)
+        # outputs = self.model(**inputs)
+        # similarity_score = outputs[0][0][0].item()
+        # return similarity_score
