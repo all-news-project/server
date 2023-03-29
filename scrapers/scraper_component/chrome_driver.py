@@ -1,8 +1,10 @@
 from datetime import datetime
 from time import sleep
+from typing import List
 
-from selenium.common import InvalidArgumentException, NoSuchElementException, TimeoutException
+from selenium.common import InvalidArgumentException, NoSuchElementException, TimeoutException, WebDriverException
 from selenium.webdriver import ActionChains, Keys
+from selenium.webdriver.chrome.options import Options
 
 from logger import get_current_logger, log_function
 from scrapers.scraper_component.utils.driver_consts import BrowserConsts, MainConsts
@@ -10,6 +12,8 @@ from scrapers.scraper_component.interfaces.base_driver_interface import BaseDriv
 from scrapers.scraper_component.utils.driver_utils import get_driver_path, get_temp_browser_profile_path, \
     create_path_if_needed, kill_browser_childes
 from selenium import webdriver
+
+from scrapers.scraper_component.utils.element import Element
 
 
 class ChromeDriver(BaseDriverInterface):
@@ -73,13 +77,19 @@ class ChromeDriver(BaseDriverInterface):
     @log_function
     def __init_chrome_driver__(self):
         try:
-            options = webdriver.ChromeOptions()
+            chrome_options = Options()
+            chrome_options.add_argument('--no-sandbox')
+            chrome_options.add_argument('--disable-dev-shm-usage')
+            chrome_options.add_argument(argument=f"user-data-dir={self.browser_profile_path}")
             if self.headless:
-                options.add_argument('--headless')
-            options.add_argument('--no-sandbox')
-            options.add_argument('--disable-dev-shm-usage')
-            options.add_argument(argument=f"user-data-dir={self.browser_profile_path}")
-            self._driver = webdriver.Chrome(executable_path=self.webdriver_path, options=options)
+                chrome_options.add_argument("--headless")
+                chrome_options.add_argument('start-maximized')
+                chrome_options.add_argument('disable-infobars')
+                chrome_options.add_argument("--disable-extensions")
+            start_time = datetime.now()
+            self._driver = webdriver.Chrome(executable_path=self.webdriver_path, options=chrome_options)
+            end_time = datetime.now()
+            self.logger.info(f"Init chrome driver in {(end_time - start_time).total_seconds()} seconds")
         except Exception as e:
             if "executable needs to be in path" in str(e).lower():
                 self.logger.error(f"PATH Error")
@@ -93,31 +103,49 @@ class ChromeDriver(BaseDriverInterface):
     @log_function
     def exit(self):
         self._driver.quit()
-        self.logger.info(f"ChromeDriver exit")
+        self.logger.info(f"Exit Chrome Driver")
 
     @log_function
     def get_url(self, url: str):
-        try:
-            self._driver.get(url)
-        except InvalidArgumentException:
-            self.logger.error(f"Error getting url: '{url}' - invalid url input format, please give full correct format")
-            self.exit()
+        for trie in range(MainConsts.GET_URL_TRIES):
+            try:
+                self.logger.debug(f"Trying to get page url: `{url}` NO. {trie + 1}/{MainConsts.GET_URL_TRIES}")
+                self._driver.get(url)
+                self.logger.info(f"Get to page url: `{url}`")
+                return
+            except InvalidArgumentException:
+                desc = f"Error getting url: '{url}' - invalid url input format, please give full correct format"
+                self.__error_and_exit(desc)
+            except WebDriverException as e:
+                if "ERR_CONNECTION_RESET" in str(e):
+                    continue
+                desc = f"Error getting to page url: `{url}` - {str(e)}"
+                self.__error_and_exit(desc)
+            except Exception as e:
+                desc = f"Error getting to page url: `{url}` - {str(e)}"
+                self.__error_and_exit(desc)
+        self.__error_and_exit(f"Error getting to page url: `{url}` after {MainConsts.GET_URL_TRIES} tries")
+
+    @log_function
+    def __error_and_exit(self, desc):
+        self.logger.error(desc)
+        self.exit()
 
     @log_function
     def get_current_url(self) -> str:
-        return self._driver.current_url
+        return self._driver.current_url if self._driver.current_url not in BrowserConsts.NEW_TAB_URLS else None
 
     @log_function
     def get_title(self) -> str:
-        return self._driver.title
+        return self._driver.title if self._driver.title != BrowserConsts.NEW_TAB_TITLE and self._driver.title else None
 
     @log_function
-    def find_element(self, by, value):
-        return self._driver.find_element(by=by, value=value)
+    def find_element(self, by, value) -> Element:
+        return Element(read_element=self._driver.find_element(by=by, value=value))
 
     @log_function
-    def find_elements(self, by, value):
-        return self._driver.find_elements(by=by, value=value)
+    def find_elements(self, by, value) -> List[Element]:
+        return [Element(read_element=element) for element in self._driver.find_elements(by=by, value=value)]
 
     @log_function
     def wait_until_object_appears(self, by, value, timeout: int = MainConsts.DEFAULT_ELEMENT_TIMEOUT):

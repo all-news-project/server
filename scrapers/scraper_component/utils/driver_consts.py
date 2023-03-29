@@ -6,6 +6,8 @@ class MainConsts:
     IMPLICITLY_WAIT_TIME = int(os.getenv(key="IMPLICITLY_WAIT_TIME", default=0))
     ELEMENT_SLEEPING_TIME = float(os.getenv(key="ELEMENT_SLEEPING_TIME", default=0.25))
     INSERT_TEXT_SLEEPING_TIME = float(os.getenv(key="INSERT_TEXT_SLEEPING_TIME", default=0.20))
+    REQUEST_TIMEOUT = int(os.getenv(key="REQUEST_TIMEOUT", default=15))
+    GET_URL_TRIES = int(os.getenv(key="REQUEST_TRIES", default=3))
 
 
 class BrowserConsts:
@@ -24,5 +26,12 @@ class BrowserConsts:
     WINDOWS_BROWSER_PATH = os.getenv(key="BROWSER_PATH", default=r"C:\BrowserProfiles\SeleniumDefaultBrowserProfiles")
     DEFAULT_BROWSER = os.getenv(key="DEFAULT_BROWSER", default=CHROME)
 
-    NEW_TAB_URL = "chrome://new-tab-page/"
+    # tabs
+    NEW_TAB_URLS = ["data:,", "chrome://new-tab-page/"]
     NEW_TAB_TITLE = "New Tab"
+
+
+class ElementsConsts:
+    REQ_ELEMENT = "req"
+    WEB_ELEMENT = "web"
+    XML_ELEMENT = "xml"

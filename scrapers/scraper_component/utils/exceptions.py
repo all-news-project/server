@@ -16,3 +16,13 @@ class UnknownOperatingSystemException(Exception):
 class UnknownBrowserException(Exception):
     def __init__(self, msg: str):
         self.msg = msg
+
+
+class UnknownElementTypeException(Exception):
+    def __init__(self, msg: str):
+        self.msg = msg
+
+
+class AttributeNameException(Exception):
+    def __init__(self, msg: str):
+        self.msg = msg
