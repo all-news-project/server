@@ -2,6 +2,8 @@ import datetime
 from dataclasses import dataclass, asdict
 from typing import List, Optional
 
+from db_utils.db_objects.cluster import Cluster
+
 
 @dataclass
 class Article:
@@ -10,8 +12,10 @@ class Article:
     website: str
     title: str
     content: str
+    summary: str
     publishing_time: datetime.datetime
     collecting_time: datetime.datetime
+    topic: Cluster
     category: Optional[str] = None
     images: Optional[List[str]] = None
     state: Optional[str] = None

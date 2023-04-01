@@ -1,5 +1,5 @@
 import unittest
-from nlp_models.model_one import nlp_similizer
+from nlp_models.nlp_utils import nlp_similizer
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
