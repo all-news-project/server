@@ -3,10 +3,11 @@ from typing import List
 
 from bson import ObjectId
 from pymongo import MongoClient
-from wise_logger import get_current_logger, log_function
 
-from db_utils.exceptions import DataNotFoundDBException, InsertDataDBException, DeleteDataDBException
+from db_utils.exceptions import DataNotFoundDBException, InsertDataDBException, DeleteDataDBException, \
+    UpdateDataDBException
 from db_utils.interface_db_utils import DBUtilsInterface
+from logger import get_current_logger, log_function
 
 
 class DBUtils(DBUtilsInterface):
@@ -82,7 +83,7 @@ class DBUtils(DBUtilsInterface):
     @log_function
     def delete_one(self, table_name: str, data_filter: dict):  # TODO: check
         try:
-            self.logger.debug(f"Trying to delete onde data from table: '{table_name}', db: '{self.DB_NAME}'")
+            self.logger.debug(f"Trying to delete one data from table: '{table_name}', db: '{self.DB_NAME}'")
             res = self._db[table_name].delete_one(data_filter)
             if res:
                 object_id = res.raw_result.get('_id')
@@ -99,24 +100,111 @@ class DBUtils(DBUtilsInterface):
 
     @log_function
     def delete_many(self, table_name: str, data_filter: dict):
-        pass
+        try:
+            self.logger.debug(f"Trying to delete collection of data from table: '{table_name}', db: '{self.DB_NAME}'")
+            res = self._db[table_name].delete_many(data_filter)
+            if res:
+                object_id = res.raw_result.get('_id')
+                self.logger.info(
+                    f"Deleted {res.deleted_count} records from db: '{self.DB_NAME}', table_name: '{table_name}', id: '{object_id}'")
+                return True
+            else:
+                desc = f"Error delete data with filter: {data_filter}, table: '{table_name}, db: {self.DB_NAME}'"
+                self.logger.error(desc)
+                raise DeleteDataDBException(desc)
+        except Exception as e:
+            self.logger.error(f"Error delete many from db: {str(e)}")
+            return False
 
     @log_function
     def update_one(self, table_name: str, data_filter: dict, new_data: dict) -> ObjectId:
-        pass
+        try:
+            self.logger.debug(f"Trying to delete one data from table: '{table_name}', db: '{self.DB_NAME}'")
+            res = self._db[table_name].update_one(data_filter, new_data)
+            if res:
+                object_id = res.raw_result.get('_id')
+                self.logger.info(
+                    f"updated one data from db: '{self.DB_NAME}', table_name: '{table_name}', id: '{object_id}'")
+                return object_id
+            else:
+                desc = f"Error delete data with filter: {data_filter}, table: '{table_name}, db: {self.DB_NAME}'"
+                self.logger.error(desc)
+                raise DeleteDataDBException(desc)
+        except Exception as e:
+            self.logger.error(f"Error delete one from db: {str(e)}")
+            raise e
 
     @log_function
     def update_many(self, table_name: str, data_filter: dict, new_data: dict) -> List[ObjectId]:
-        pass
+        try:
+            self.logger.debug(
+                f"Trying to update {len(new_data)} records from table: '{table_name}', db: '{self.DB_NAME}'")
+            res = self._db[table_name].update_many(data_filter, new_data)
+            if res:
+                object_id = res.raw_result.get('_id')
+                self.logger.info(
+                    f"updated {res.matched_count} records from db: '{self.DB_NAME}', table_name: '{table_name}', id: '{object_id}'")
+                return object_id
+            else:
+                desc = f"Error update data with filter: {data_filter}, table: '{table_name}, db: {self.DB_NAME}'"
+                self.logger.error(desc)
+                raise UpdateDataDBException(desc)
+        except Exception as e:
+            self.logger.error(f"Error delete one from db: {str(e)}")
+            raise e
 
     @log_function
     def count(self, table_name: str, data_filter: dict) -> int:
-        pass
+        try:
+            self.logger.debug(
+                f"Trying to count table: '{table_name}', db: '{self.DB_NAME}'")
+            res = self._db[table_name].count_documents(data_filter)
+            if res > 0:
+                # object_id = res.raw_result.get('_id')
+                self.logger.info(
+                    f"Counted {res} records from db: '{self.DB_NAME}', table_name: '{table_name}")
+                return res
+            else:
+                desc = f"Error counting with filter: {data_filter}, table: '{table_name}, db: {self.DB_NAME}'"
+                self.logger.error(desc)
+                # raise UpdateDataDBException(desc)
+        except Exception as e:
+            self.logger.error(f"Error counting from db: {str(e)}")
+            raise e
 
     @log_function
     def exists(self, table_name: str, data_filter: dict) -> bool:
-        pass
+        try:
+            self.logger.debug(
+                f"Trying to count table: '{table_name}', db: '{self.DB_NAME}'")
+            res = self.count(table_name, data_filter)
+            if res > 0:
+                # object_id = res.raw_result.get('_id')
+                self.logger.info(
+                    f"Found {res} in db: '{self.DB_NAME}', table_name: '{table_name}'")
+                return True
+            else:
+                desc = f"Didn't find record with filter: {data_filter}, table: '{table_name}, db: {self.DB_NAME}'"
+                self.logger.error(desc)
+                return False
+                # raise UpdateDataDBException(desc)
+        except Exception as e:
+            self.logger.error(f"Error counting from db: {str(e)}")
+            return False
 
     @log_function
     def get_many(self, table_name: str, data_filter: dict) -> List[dict]:
-        pass
+        try:
+            self.logger.debug(f"Trying to get one data from table: '{table_name}', db: '{self.DB_NAME}'")
+            res = self._db[table_name].find(data_filter)
+            if res:
+                object_id = res.cursor_id
+                self.logger.info(f"Got data from db: '{self.DB_NAME}', table_name: '{table_name}', id: '{object_id}'")
+                return list(dict(res))
+            else:
+                desc = f"Error find data with filter: {data_filter}, table: '{table_name}', db: '{self.DB_NAME}'"
+                self.logger.error(desc)
+                raise DataNotFoundDBException(desc)
+        except Exception as e:
+            self.logger.error(f"Error get many from db - {str(e)}")
+            raise e
