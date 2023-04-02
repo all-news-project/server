@@ -5,9 +5,9 @@
 # Here is an example of how you might use the Gensim library to extract the topics from two texts and compare them:
 
 # Copy code
-import gensim
-from gensim.utils import simple_preprocess
-from gensim.parsing.preprocessing import STOPWORDS
+# import gensim
+# from gensim.utils import simple_preprocess
+# from gensim.parsing.preprocessing import STOPWORDS
 from nltk.stem import WordNetLemmatizer, SnowballStemmer
 from nltk.stem.porter import *
 
@@ -54,25 +54,41 @@ from nltk.stem.porter import *
 # This code uses the Gensim library to apply the Latent Dirichlet Allocation (LDA) algorithm to the two texts, and then extracts the top 10 words from each topic. It then compares the resulting topics to see if there is any overlap, and prints a message indicating whether the texts are about the same subject or not.
 
 # Note that this code is just an example, and you may need to adjust the parameters and settings of the LDA model to get the best results for your specific texts. Additionally, you may want to use other topic modeling algorithms or NLP techniques to extract the topics from the texts.
+#
 
-class genis:
-    def __init__(self, stemmer=SnowballStemmer("english")):
-        self.stemmer = stemmer
+from transformers import BertModel,BertTokenizer
+def sim_rate(text1,text2):
+    model = BertModel.from_pretrained("bert-base-uncased")
+    tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+    # text1 = "The world is a beautiful place full of amazing sights and experiences."
+    # text2 = "There are many wonders to be found in nature, from the tallest mountains to the deepest oceans."
+    inputs = tokenizer.encode_plus(text1, text2, return_tensors="pt", max_length=128)
+    # Pass the encoded inputs through the BERT model
+    outputs = model(**inputs)
+    # Calculate the similarity score between the texts
+    similarity_score = outputs[0][0][0]
 
-    def compare_texts(self, text1, text2):
-        processed_text1 = self._preprocess(text1)
-        processed_text2 = self._preprocess(text2)
-        dictionary = gensim.corpora.Dictionary([processed_text1, processed_text2])
-        corpus = [dictionary.doc2bow(text) for text in [processed_text1, processed_text2]]
-        lda_model = gensim.models.LdaModel(corpus, num_topics=2, id2word=dictionary, passes=10)
-        topics1 = set([word for word, _ in lda_model.get_topic_terms(0, topn=10)])
-        topics2 = set([word for word, _ in lda_model.get_topic_terms(1, topn=10)])
-        common_topics = topics1.intersection(topics2)
-        return common_topics
+    # Print the similarity score
+    print(f"Similarity score: {similarity_score}")
 
-    def _preprocess(self, text):
-        result = []
-        for token in gensim.utils.simple_preprocess(text):
-            if token not in gensim.parsing.preprocessing.STOPWORDS and len(token) > 3:
-                result.append(self.stemmer.stem(token))
-        return result
+# class genis:
+#     def __init__(self, stemmer=SnowballStemmer("english")):
+#         self.stemmer = stemmer
+#
+#     def compare_texts(self, text1, text2):
+#         processed_text1 = self._preprocess(text1)
+#         processed_text2 = self._preprocess(text2)
+#         dictionary = gensim.corpora.Dictionary([processed_text1, processed_text2])
+#         corpus = [dictionary.doc2bow(text) for text in [processed_text1, processed_text2]]
+#         lda_model = gensim.models.LdaModel(corpus, num_topics=2, id2word=dictionary, passes=10)
+#         topics1 = set([word for word, _ in lda_model.get_topic_terms(0, topn=10)])
+#         topics2 = set([word for word, _ in lda_model.get_topic_terms(1, topn=10)])
+#         common_topics = topics1.intersection(topics2)
+#         return common_topics
+#
+#     def _preprocess(self, text):
+#         result = []
+#         for token in gensim.utils.simple_preprocess(text):
+#             if token not in gensim.parsing.preprocessing.STOPWORDS and len(token) > 3:
+#                 result.append(self.stemmer.stem(token))
+#         return result

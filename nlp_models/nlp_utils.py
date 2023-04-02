@@ -4,9 +4,14 @@
 
 # Copy code
 import os
+
+import db_utils
 from logger import get_current_logger, log_function
 import transformers
+from transformers import DistilBertModel, DistilBertTokenizer, T5Tokenizer, T5ForConditionalGeneration, BertModel, \
+    BertTokenizer
 from sentence_transformers import SentenceTransformer
+from db_utils.db_objects.db_objects_utils import update_cluster, create_new_cluster
 import numpy as np
 
 logger = get_current_logger()
@@ -39,43 +44,60 @@ from db_utils import Article
 from db_utils.db_objects.cluster import Cluster
 from exceptions import SimilarityNotFoundException
 
+db = db_utils.get_current_db_driver()
+"""This function is used to check the similarity between unclassified article and a specific cluster's articles"""
+
 
 @log_function
 def cluster_similarity(cluster: Cluster, new_article: Article) -> float:
-    sim_rate = similarity([cluster.article_content, new_article.content])
-    if sim_rate > 75:
+    sim_rate = compare_text([cluster.article_content, new_article.content])
+
+    if sim_rate > 60:
         avg_rate = 0  # this look better , but its easier to understand the bottom ->sum([self.similizer.similarity([newArticle])])
-        for article in cluster.articles:
-            avg_rate = avg_rate + similarity([new_article, article.summary])
-        avg_rate = avg_rate / len(cluster.articles)
-        if avg_rate > 60:
-            # TODO: add logging here
-            logger.debug("High similarity with article , checking average")
+        articles = db.get_many("articles", {"article_id": cluster.articles_id})
+        for article in articles:
+            avg_rate = avg_rate + compare_text([new_article, article.summary])
+        avg_rate = avg_rate / len(articles)
+        if sim_rate > 75 and avg_rate >60:
+            logger.debug(f"High similarity with article,average{avg_rate}")
             # self.add_article(newArticle)
             return (avg_rate + sim_rate) / 2
-    elif sim_rate > 60:
-        avg_rate = 0  # this look better , but its easier to understand the bottom ->sum([self.similizer.similarity([newArticle])])
-        for article in cluster.articles:
-            avg_rate = avg_rate + similarity([new_article, article.summary])
-        avg_rate = avg_rate / len(cluster.articles)
-        if avg_rate > 70:
-            # TODO: add logging here
-            logger.debug("Low similarity with article , checking average")
+        elif sim_rate >60 and avg_rate >70:
+            logger.debug(f"Low similarity with article,average{avg_rate}")
             # self.add_article(newArticle)
             return (avg_rate + sim_rate) / 2
+    # elif sim_rate > 60:
+    #     avg_rate = 0  # this look better , but its easier to understand the bottom ->sum([self.similizer.similarity([newArticle])])
+    #     for article in cluster.articles:
+    #         avg_rate = avg_rate + compare_text([new_article, article.summary])
+    #     avg_rate = avg_rate / len(cluster.articles)
+    #     if avg_rate > 70:
+    #         logger.debug("Low similarity with article , checking average")
+    #         # self.add_article(newArticle)
+    #         return (avg_rate + sim_rate) / 2
     else:
         desc = f"Error Similarity rate {sim_rate}, Similarity not found"
         logger.debug(f"Similarity not found in {cluster.title}")
         raise SimilarityNotFoundException(desc)  # TODO: add exception similarity not found
 
 
-@log_function
-def summarize(article: Article):
-    pass
+"""This function uses the T5-large model in order to summarize our articles"""
 
 
 @log_function
-def similarity(self, sentences: list[str]):
+def summarize_text(content: str):
+    # articles = data['Text'].tolist()
+    model = T5ForConditionalGeneration.from_pretrained('t5-large')  # can change to t5-small
+    tokenizer = T5Tokenizer.from_pretrained('t5-large')  # same here
+    content = content.strip().replace("\n", "")
+    return __article_sum(content, model, tokenizer)
+
+
+"""This function uses the sentence transformer to caculate the similarity between 2 texts"""
+
+
+@log_function
+def compare_text(sentences: list[str]):
     model = SentenceTransformer('sentence-transformers/all-mpnet-base-v1')
     embeddings = model.encode(sentences)
     d = np.dot(embeddings[0], embeddings[1], out=None)
@@ -85,10 +107,13 @@ def similarity(self, sentences: list[str]):
     # return similarity_score
 
 
-@log_function
-def find_cluster(clusters: list[Cluster], article: Article):
-    # USE_CATEGORIAL_CLASSIFICATION = bool(os.getenv(key="USE_CATEGORIAL_CLASSIFICATION", default=False))
+"""This function searches every cluster in the database to find the best match for the current article
+    by checking the similarity rate of every article in each cluster"""
 
+
+@log_function
+def classify_article(clusters: list[Cluster], article: Article):
+    # USE_CATEGORIAL_CLASSIFICATION = bool(os.getenv(key="USE_CATEGORIAL_CLASSIFICATION", default=False))
     counter = 0  # im adding this counter to check the number of clusters this subjects corresponds to for stats
     max_topic = None
     max_sim = 0
@@ -101,13 +126,43 @@ def find_cluster(clusters: list[Cluster], article: Article):
                 max_topic = cluster
                 max_sim = sim_rate
     if max_sim > 0:
-        max_topic.add_article(article)
+        # max_topic.articles_id.append(article.article_id)
+        update_cluster(max_topic, article)
+        # max_topic.add_article(article)
         logger.debug(f"Adding article to cluster {max_topic.title}")
-        # TODO:add logging here
     else:
-        newTopic = Cluster(article)  # needed to add here : a constructor
+        create_new_cluster(article)
         logger.debug("Could not find cluster, creating new cluster")
-        # TODO: push new article cluster into db
     # if counter > 1:
     #     pass
     # add an error log here to check why it corresponds to more than 1 topic
+
+
+"""This function uses the DistilBert pretrained model by valurank in order to categorize articles."""
+
+
+@log_function
+def categorize_article(article: Article):
+    logger.debug("Categorizing article")
+    tokenizer = DistilBertTokenizer.from_pretrained('finetuned-distilbert-news-article-categorization')
+    model = DistilBertModel.from_pretrained("finetuned-distilbert-news-article-categorization")
+    encoded_input = tokenizer.encode(article.content, return_tensors='pt')
+    output = model(**encoded_input)
+    return output
+
+
+""""This function uses the T5 model and tokenizer inorder to encode and decode the text
+to get the most important features and summarize the text"""
+
+
+def __article_sum(article, model, tokenizer: T5Tokenizer):
+    t5_prepared_text = "summarize: " + article
+    tokenized_text = tokenizer.encode(t5_prepared_text, return_tensors="pt")
+    summary_ids = model.generate(tokenized_text,
+                                 num_beams=4,
+                                 no_repeat_ngram_size=2,
+                                 min_length=30,
+                                 max_length=100,
+                                 early_stopping=True)
+    summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+    return summary

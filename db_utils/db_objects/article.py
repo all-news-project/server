@@ -14,11 +14,12 @@ class Article:
     content: str
     summary: str
     publishing_time: datetime.datetime
-    collecting_time: datetime.datetime
-    topic: Cluster
+    collecting_time: datetime.datetime = None
+    cluster_id: str = None
     category: Optional[str] = None
     images: Optional[List[str]] = None
     state: Optional[str] = None
+    task_id: str = None
 
     def __repr__(self) -> str:
         string = ''
