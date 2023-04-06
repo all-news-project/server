@@ -2,7 +2,7 @@ from datetime import datetime
 from dataclasses import asdict, dataclass
 from typing import Optional
 
-from nlp_models.model_two import genis
+# from nlp_models.model_two import genis
 from db_utils import Article
 
 
@@ -12,12 +12,13 @@ from db_utils import Article
 class Cluster:
     cluster_id: str
     articles_id: list[str]
-    summary: str
-    title: str
-    article_content: str
+    # title: str
+    # article_content: str
+    main_article_id :str
     creation_time: datetime
     last_updated: datetime
     websites: list[str]
+    # summary: str = None
     category: Optional[str] = None
 
     def convert_to_dict(self) -> dict:
