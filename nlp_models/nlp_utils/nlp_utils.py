@@ -7,12 +7,17 @@ import datetime
 import os
 import uuid
 
+import spacy
+from nltk import PorterStemmer
+
 import db_utils
 from logger import get_current_logger, log_function
 import transformers
 from transformers import DistilBertModel, DistilBertTokenizer, T5Tokenizer, T5ForConditionalGeneration, BertModel, \
     BertTokenizer
 from sentence_transformers import SentenceTransformer
+from nltk.tokenize import  sent_tokenize,word_tokenize
+from sklearn.feature_extraction.text import TfidfVectorizer
 # from db_utils.db_objects.db_objects_utils import update_cluster, create_new_cluster
 
 import numpy as np
@@ -71,4 +76,30 @@ def __text_sum(text: str, model: T5ForConditionalGeneration, tokenizer: T5Tokeni
     summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
     return summary
 
+# need to look further into transformers
 
+def sim(text1, text2):
+    nlp = spacy.load("en_core_web_lg")
+    final_1 = _preprocess(text1, nlp)
+    final_2 = _preprocess(text2, nlp)
+    similarity = final_1.similarity(final_2)
+
+def _preprocess(text, nlp):
+    result_1 = []
+    logger.debug("Preprocessing Text")
+    process1 = nlp(text.lower())
+    # This is the lemmatization process
+    for token in process1:
+        if token.text in nlp.Defaults.stop_words:
+            continue
+        if token.is_punct:
+            continue
+        if token.lemma_ == "-PRON-":
+            continue
+        result_1.append(token.lemma_)
+    result1 = " ".join(result_1)
+    final = nlp(result1)
+    #cv = TfidfVectorizer()
+    #x=cv.fit_transform(final)#.toarray()
+    # stemmer=PorterStemmer()
+    return final
