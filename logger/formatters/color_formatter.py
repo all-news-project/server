@@ -2,8 +2,8 @@ import logging
 import logging.handlers
 import re
 
-from logger.consts import ColorCodes, MainConsts
-from logger.style_formatter import StyleFormatter
+from logger.formatters.consts import ColorCodes, MainConsts
+from logger.formatters.style_formatter import StyleFormatter
 
 
 class ColorFormatter(logging.Formatter):
