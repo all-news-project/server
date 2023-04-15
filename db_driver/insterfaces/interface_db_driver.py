@@ -2,7 +2,7 @@ from typing import List
 from bson import ObjectId
 
 
-class DBUtilsInterface:
+class DBDriverInterface:
     def insert_one(self, table_name: str, data: dict) -> ObjectId:
         """
         Insert one data to db

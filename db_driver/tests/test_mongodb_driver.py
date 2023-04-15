@@ -6,7 +6,7 @@ from db_driver.db_objects.article import Article
 from db_driver.db_objects.db_objects_utils import get_db_object_from_dict
 
 
-class TestMongoDBUtils(TestCase):
+class TestMongoDBDriver(TestCase):
     # TODO: add and fix tests
     def test_insert_one(self):
         try:
@@ -50,7 +50,7 @@ class TestMongoDBUtils(TestCase):
                     publishing_time=publishing_time, collecting_time=collecting_time
                 )
             ]
-            return db_utils.insert_many(table_name='articles', data=test_articles.convert_to_dict())
+            return db_utils.insert_many(table_name='articles', data=[test_article.convert_to_dict() for test_article in test_articles])
         except Exception as e:
             print(f"test_insert_one: {e}")
             self.fail()

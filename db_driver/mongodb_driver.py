@@ -4,21 +4,19 @@ from typing import List
 from bson import ObjectId
 from pymongo import MongoClient
 
-from db_driver.insterfaces.interface_db_utils import DBUtilsInterface
+from db_driver.insterfaces.interface_db_driver import DBDriverInterface
 from db_driver.utils.exceptions import InsertDataDBException, DataNotFoundDBException, DeleteDataDBException, \
     UpdateDataDBException
 from logger import get_current_logger, log_function
+from server_utils.db_utils import get_mongodb_connection_string
 
 
-class MongoDBDriver(DBUtilsInterface):
+class MongoDBDriver(DBDriverInterface):
     DB_NAME = os.getenv(key='DB_NAME', default='local_restore')
-    DB_PASSWORD = os.getenv(key='DB_PASSWORD')
-    DB_URL = os.getenv(key='DB_URL')
-    CONNECTION_STRING = os.getenv(key="CONNECTION_STRING")
 
     def __init__(self):
         self.logger = get_current_logger()
-        self._initialize_connection_string()
+        self._connection_string = get_mongodb_connection_string()
         self.__client = MongoClient(self._connection_string)
         self.__db = self.__client[self.DB_NAME]
         self.logger.debug(f"Connected to mongodb")
@@ -26,19 +24,6 @@ class MongoDBDriver(DBUtilsInterface):
     @log_function
     def close(self):
         self.__client.close()
-
-    @log_function
-    def _initialize_connection_string(self):
-        if not self.CONNECTION_STRING:
-            self._check_password_and_db_name_validation()
-            self._connection_string = f"mongodb+srv://allnews:{self.DB_PASSWORD}@{self.DB_URL}"
-        else:
-            self._connection_string = self.CONNECTION_STRING
-
-    @log_function
-    def _check_password_and_db_name_validation(self):
-        if not self.DB_PASSWORD or not self.DB_URL:
-            raise ValueError(f"Cannot connect to db when DB_PASSWORD or DB_URL are None value or empty string")
 
     @log_function
     def insert_one(self, table_name: str, data: dict) -> ObjectId:
