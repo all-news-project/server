@@ -4,7 +4,7 @@ import sys
 
 from logger.formatters.color_formatter import ColorFormatter
 from logger.formatters.consts import MainConsts
-from logger.log_db_handler import LogDBHandler
+from logger.handlers.log_db_handler import LogDBHandler
 from server_utils.singleton_class import Singleton
 
 

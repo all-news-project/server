@@ -8,6 +8,7 @@ from scrapers.scraper_component import get_scraping_driver
 
 
 class TestChromeDriver(TestCase):
+    # TODO: add tests that insert data to the database
     SLEEP_TIME_AFTER_TEST = 3
     USE_REQUEST_DRIVER = False
     HEADLESS = False

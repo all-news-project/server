@@ -1,8 +1,9 @@
 from datetime import datetime
 from unittest import TestCase
 
-from db_utils import get_current_db_driver, Article
-from db_utils.db_objects.db_objects_utils import get_db_object_from_dict
+from db_driver import get_current_db_driver
+from db_driver.db_objects.article import Article
+from db_driver.db_objects.db_objects_utils import get_db_object_from_dict
 
 
 class TestMongoDBUtils(TestCase):
@@ -133,10 +134,10 @@ class TestMongoDBUtils(TestCase):
 
     # def test_update_one(self):
     #     try:
-    #         db_utils = get_current_db_driver()
+    #         db_driver = get_current_db_driver()
     #         _id = self.test_insert_one()
     #         data_filter = {'article_id': _id}
-    #         flag = db_utils.update_one(table_name='articles', data_filter=data_filter)
+    #         flag = db_driver.update_one(table_name='articles', data_filter=data_filter)
     #         if not flag:
     #             self.fail()
     #     except Exception as e:

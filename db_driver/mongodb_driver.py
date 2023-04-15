@@ -4,13 +4,13 @@ from typing import List
 from bson import ObjectId
 from pymongo import MongoClient
 
-from db_utils.exceptions import DataNotFoundDBException, InsertDataDBException, DeleteDataDBException, \
+from db_driver.insterfaces.interface_db_utils import DBUtilsInterface
+from db_driver.utils.exceptions import InsertDataDBException, DataNotFoundDBException, DeleteDataDBException, \
     UpdateDataDBException
-from db_utils.interface_db_utils import DBUtilsInterface
 from logger import get_current_logger, log_function
 
 
-class DBUtils(DBUtilsInterface):
+class MongoDBDriver(DBUtilsInterface):
     DB_NAME = os.getenv(key='DB_NAME', default='local_restore')
     DB_PASSWORD = os.getenv(key='DB_PASSWORD')
     DB_URL = os.getenv(key='DB_URL')

@@ -1,4 +1,4 @@
 .idea/*
-db_utils/cred
+db_driver/cred
 venv/
 *_pids.txt
