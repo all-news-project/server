@@ -1,5 +1,5 @@
 class MainConsts:
-    CONSOLE_FORMAT = "%(asctime)s | %(levelname)-8s | %(message)s"
+    CONSOLE_FORMAT = "%(asctime)s | %(levelname)-8s | %(message)s | %(task_type)s | %(task_id)s"
     LEVEL_FIELDS = ["levelname", "levelno"]
 
 

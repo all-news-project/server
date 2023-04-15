@@ -14,17 +14,26 @@ class DBUtils(DBUtilsInterface):
     DB_NAME = os.getenv(key='DB_NAME', default='local_restore')
     DB_PASSWORD = os.getenv(key='DB_PASSWORD')
     DB_URL = os.getenv(key='DB_URL')
+    CONNECTION_STRING = os.getenv(key="CONNECTION_STRING")
 
     def __init__(self):
         self.logger = get_current_logger()
-        self._check_password_and_db_name_validation()
-        self.__client = MongoClient(f"mongodb+srv://allnews:{self.DB_PASSWORD}@{self.DB_URL}")
+        self._initialize_connection_string()
+        self.__client = MongoClient(self._connection_string)
         self.__db = self.__client[self.DB_NAME]
-        self.logger.debug(f"Connected to mongodb ")
+        self.logger.debug(f"Connected to mongodb")
 
     @log_function
     def close(self):
         self.__client.close()
+
+    @log_function
+    def _initialize_connection_string(self):
+        if not self.CONNECTION_STRING:
+            self._check_password_and_db_name_validation()
+            self._connection_string = f"mongodb+srv://allnews:{self.DB_PASSWORD}@{self.DB_URL}"
+        else:
+            self._connection_string = self.CONNECTION_STRING
 
     @log_function
     def _check_password_and_db_name_validation(self):
@@ -108,9 +117,8 @@ class DBUtils(DBUtilsInterface):
             self.logger.debug(f"Trying to delete collection of data from table: '{table_name}', db: '{self.DB_NAME}'")
             res = self.__db[table_name].delete_many(data_filter)
             if res:
-                object_id = res.raw_result.get('_id')
                 self.logger.info(
-                    f"Deleted {res.deleted_count} records from db: '{self.DB_NAME}', table_name: '{table_name}', id: '{object_id}'")
+                    f"Deleted {res.deleted_count} records from db: '{self.DB_NAME}', " f"table_name: '{table_name}'")
                 return True
             else:
                 desc = f"Error delete data with filter: {data_filter}, table: '{table_name}, db: {self.DB_NAME}'"

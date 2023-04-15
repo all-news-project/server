@@ -12,11 +12,20 @@ class LogDBHandler(logging.Handler):
     DB_PASSWORD = os.getenv(key='DB_PASSWORD')
     DB_URL = os.getenv(key='DB_URL')
     LOG_TABLE = "log"
+    CONNECTION_STRING = os.getenv(key="CONNECTION_STRING")
+    connection_string = None
 
     def _connect(self):
-        self._check_password_and_db_name_validation()
-        self.__client = MongoClient(f"mongodb+srv://allnews:{self.DB_PASSWORD}@{self.DB_URL}")
+        self._initialize_connection_string()
+        self.__client = MongoClient(self.connection_string)
         self.__db = self.__client[self.DB_NAME]
+
+    def _initialize_connection_string(self):
+        if not self.CONNECTION_STRING:
+            self._check_password_and_db_name_validation()
+            self._connection_string = f"mongodb+srv://allnews:{self.DB_PASSWORD}@{self.DB_URL}"
+        else:
+            self._connection_string = self.CONNECTION_STRING
 
     def _check_password_and_db_name_validation(self):
         if not self.DB_PASSWORD or not self.DB_URL:

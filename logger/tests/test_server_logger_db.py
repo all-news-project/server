@@ -15,15 +15,17 @@ class TestServerLoggerDB(TestCase):
         msg = "text_debug_" * 10
         level = "DEBUG"
 
+        logger = get_current_logger(task_id=task_id, task_type=task_type)
         db = get_current_db_driver()
+
+        self.assertEqual(logger, db.logger)
 
         all_log_args = {"table_name": "log", "data_filter": {"task_type": task_type}}
         db.delete_many(**all_log_args)
 
-        is_exists_by_task_id = db.exists(**all_log_args)
-        self.assertFalse(is_exists_by_task_id)
+        is_exists_by_task_id = db.count(**all_log_args)
+        self.assertEqual(is_exists_by_task_id, 4)
 
-        logger = get_current_logger(task_id=task_id, task_type=task_type)
         self.assertIsNotNone(logger)
         current_time = datetime.now()
         logger.debug(msg=msg)
@@ -55,6 +57,8 @@ class TestServerLoggerDB(TestCase):
 
         log_count = db.count(**log_args)
         self.assertEqual(log_count, 0)
+
+        db.delete_many(**all_log_args)
 
     def test_info(self):
         self.fail()
