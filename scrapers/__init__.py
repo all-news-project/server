@@ -2,10 +2,17 @@ from logger import get_current_logger
 from scrapers.websites_scrapers.utils.exceptions import UnknownWebsiteScraperException
 from scrapers.websites_scrapers.website_scraper_base import WebsiteScraperBase
 
-SCRAPERS = {}
+SCRAPERS = {}  # example: "bbc": BBCWebsiteScraper
 
 
 def websites_scrapers_factory(scraper_name: str, *args, **kwargs) -> WebsiteScraperBase:
+    """
+    Website scrapers factory of given `scraper_name` returning website scraper class instance
+    :param scraper_name:
+    :param args:
+    :param kwargs:
+    :return:
+    """
     logger = get_current_logger()
     try:
         return SCRAPERS[scraper_name](*args, **kwargs)
