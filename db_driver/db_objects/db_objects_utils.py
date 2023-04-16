@@ -1,4 +1,7 @@
-def get_db_object_from_dict(object_dict: dict, class_instance) -> object:
+from typing import Any
+
+
+def get_db_object_from_dict(object_dict: dict, class_instance) -> Any:
     """
     Getting a database dictionary and a class and return the database object
 

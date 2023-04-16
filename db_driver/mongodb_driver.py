@@ -4,34 +4,32 @@ from typing import List
 from bson import ObjectId
 from pymongo import MongoClient
 
-from db_utils.exceptions import DataNotFoundDBException, InsertDataDBException, DeleteDataDBException, \
+from db_driver.insterfaces.interface_db_driver import DBDriverInterface
+from db_driver.utils.exceptions import InsertDataDBException, DataNotFoundDBException, DeleteDataDBException, \
     UpdateDataDBException
-from db_utils.interface_db_utils import DBUtilsInterface
 from logger import get_current_logger, log_function
+from server_utils.db_utils import get_mongodb_connection_string
 
 
-class DBUtils(DBUtilsInterface):
+class MongoDBDriver(DBDriverInterface):
     DB_NAME = os.getenv(key='DB_NAME', default='local_restore')
-    DB_PASSWORD = os.getenv(key='DB_PASSWORD')
-    DB_URL = os.getenv(key='DB_URL')
 
     def __init__(self):
         self.logger = get_current_logger()
-        self._check_password_and_db_name_validation()
-        client = MongoClient(f"mongodb+srv://allnews:{self.DB_PASSWORD}@{self.DB_URL}")
-        self._db = client[self.DB_NAME]
-        self.logger.debug(f"Connected to mongodb ")
+        self._connection_string = get_mongodb_connection_string()
+        self.__client = MongoClient(self._connection_string)
+        self.__db = self.__client[self.DB_NAME]
+        self.logger.debug(f"Connected to mongodb")
 
     @log_function
-    def _check_password_and_db_name_validation(self):
-        if not self.DB_PASSWORD or not self.DB_URL:
-            raise ValueError(f"Cannot connect to db when DB_PASSWORD or DB_URL are None value or empty string")
+    def close(self):
+        self.__client.close()
 
     @log_function
     def insert_one(self, table_name: str, data: dict) -> ObjectId:
         try:
             self.logger.debug(f"Trying to insert data to table: '{table_name}', db: '{self.DB_NAME}'")
-            res = self._db[table_name].insert_one(data)
+            res = self.__db[table_name].insert_one(data)
             if res:
                 self.logger.info(f"Successfully inserted data to db, object id: '{str(res.inserted_id)}'")
                 return res.inserted_id
@@ -50,7 +48,7 @@ class DBUtils(DBUtilsInterface):
             return list()
         try:
             self.logger.debug(f"Trying to insert {len(data_list)} to table: '{table_name}', db: '{self.DB_NAME}'")
-            res = self._db[table_name].insert_many(data_list)
+            res = self.__db[table_name].insert_many(data_list)
             if res:
                 for inserted_id in res.inserted_ids:
                     self.logger.info(f"Successfully inserted data to db, object id: {str(inserted_id)}")
@@ -67,7 +65,7 @@ class DBUtils(DBUtilsInterface):
     def get_one(self, table_name: str, data_filter: dict) -> dict:
         try:
             self.logger.debug(f"Trying to get one data from table: '{table_name}', db: '{self.DB_NAME}'")
-            res = self._db[table_name].find_one(data_filter)
+            res = self.__db[table_name].find_one(data_filter)
             if res:
                 object_id = res.get('_id')
                 self.logger.info(f"Got data from db: '{self.DB_NAME}', table_name: '{table_name}', id: '{object_id}'")
@@ -81,10 +79,10 @@ class DBUtils(DBUtilsInterface):
             raise e
 
     @log_function
-    def delete_one(self, table_name: str, data_filter: dict):  # TODO: check
+    def delete_one(self, table_name: str, data_filter: dict) -> bool:  # TODO: check
         try:
             self.logger.debug(f"Trying to delete one data from table: '{table_name}', db: '{self.DB_NAME}'")
-            res = self._db[table_name].delete_one(data_filter)
+            res = self.__db[table_name].delete_one(data_filter)
             if res:
                 object_id = res.raw_result.get('_id')
                 self.logger.info(
@@ -99,14 +97,13 @@ class DBUtils(DBUtilsInterface):
             return False
 
     @log_function
-    def delete_many(self, table_name: str, data_filter: dict):
+    def delete_many(self, table_name: str, data_filter: dict) -> bool:
         try:
             self.logger.debug(f"Trying to delete collection of data from table: '{table_name}', db: '{self.DB_NAME}'")
-            res = self._db[table_name].delete_many(data_filter)
+            res = self.__db[table_name].delete_many(data_filter)
             if res:
-                object_id = res.raw_result.get('_id')
                 self.logger.info(
-                    f"Deleted {res.deleted_count} records from db: '{self.DB_NAME}', table_name: '{table_name}', id: '{object_id}'")
+                    f"Deleted {res.deleted_count} records from db: '{self.DB_NAME}', " f"table_name: '{table_name}'")
                 return True
             else:
                 desc = f"Error delete data with filter: {data_filter}, table: '{table_name}, db: {self.DB_NAME}'"
@@ -120,7 +117,7 @@ class DBUtils(DBUtilsInterface):
     def update_one(self, table_name: str, data_filter: dict, new_data: dict) -> ObjectId:
         try:
             self.logger.debug(f"Trying to delete one data from table: '{table_name}', db: '{self.DB_NAME}'")
-            res = self._db[table_name].update_one(data_filter, new_data)
+            res = self.__db[table_name].update_one(data_filter, new_data)
             if res:
                 object_id = res.raw_result.get('_id')
                 self.logger.info(
@@ -139,7 +136,7 @@ class DBUtils(DBUtilsInterface):
         try:
             self.logger.debug(
                 f"Trying to update {len(new_data)} records from table: '{table_name}', db: '{self.DB_NAME}'")
-            res = self._db[table_name].update_many(data_filter, new_data)
+            res = self.__db[table_name].update_many(data_filter, new_data)
             if res:
                 object_id = res.raw_result.get('_id')
                 self.logger.info(
@@ -158,16 +155,14 @@ class DBUtils(DBUtilsInterface):
         try:
             self.logger.debug(
                 f"Trying to count table: '{table_name}', db: '{self.DB_NAME}'")
-            res = self._db[table_name].count_documents(data_filter)
-            if res > 0:
-                # object_id = res.raw_result.get('_id')
-                self.logger.info(
-                    f"Counted {res} records from db: '{self.DB_NAME}', table_name: '{table_name}")
+            res = self.__db[table_name].count_documents(data_filter)
+            if res and res > 0:
+                self.logger.info(f"Counted {res} records from db: '{self.DB_NAME}', table_name: '{table_name}")
                 return res
             else:
-                desc = f"Error counting with filter: {data_filter}, table: '{table_name}, db: {self.DB_NAME}'"
-                self.logger.error(desc)
-                # raise UpdateDataDBException(desc)
+                desc = f"Didn't find record with filter: {data_filter}, table: '{table_name}, db: {self.DB_NAME}'"
+                self.logger.debug(desc)
+                return 0
         except Exception as e:
             self.logger.error(f"Error counting from db: {str(e)}")
             raise e
@@ -178,16 +173,15 @@ class DBUtils(DBUtilsInterface):
             self.logger.debug(
                 f"Trying to count table: '{table_name}', db: '{self.DB_NAME}'")
             res = self.count(table_name, data_filter)
-            if res > 0:
+            if res and res > 0:
                 # object_id = res.raw_result.get('_id')
                 self.logger.info(
                     f"Found {res} in db: '{self.DB_NAME}', table_name: '{table_name}'")
                 return True
             else:
                 desc = f"Didn't find record with filter: {data_filter}, table: '{table_name}, db: {self.DB_NAME}'"
-                self.logger.error(desc)
+                self.logger.warning(desc)
                 return False
-                # raise UpdateDataDBException(desc)
         except Exception as e:
             self.logger.error(f"Error counting from db: {str(e)}")
             return False
@@ -196,14 +190,14 @@ class DBUtils(DBUtilsInterface):
     def get_many(self, table_name: str, data_filter: dict) -> List[dict]:
         try:
             self.logger.debug(f"Trying to get one data from table: '{table_name}', db: '{self.DB_NAME}'")
-            res = self._db[table_name].find(data_filter)
+            res = self.__db[table_name].find(data_filter)
             if res:
                 object_id = res.cursor_id
                 self.logger.info(f"Got data from db: '{self.DB_NAME}', table_name: '{table_name}', id: '{object_id}'")
                 return list(dict(res))
             else:
                 desc = f"Error find data with filter: {data_filter}, table: '{table_name}', db: '{self.DB_NAME}'"
-                self.logger.error(desc)
+                self.logger.warning(desc)
                 raise DataNotFoundDBException(desc)
         except Exception as e:
             self.logger.error(f"Error get many from db - {str(e)}")
