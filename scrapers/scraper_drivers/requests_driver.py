@@ -4,10 +4,10 @@ from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from logger import get_current_logger, log_function
-from scrapers.scraper_component.utils.driver_consts import MainConsts
-from scrapers.scraper_component.utils.element import Element
-from scrapers.scraper_component.utils.exceptions import PageNotFoundException, AttributeNameException
-from scrapers.scraper_component.interfaces.base_driver_interface import BaseDriverInterface
+from scrapers.scraper_drivers.utils.driver_consts import MainConsts
+from scrapers.scraper_drivers.utils.element import Element
+from scrapers.scraper_drivers.utils.exceptions import PageNotFoundException, AttributeNameException
+from scrapers.scraper_drivers.interfaces.base_driver_interface import BaseDriverInterface
 
 from urllib.request import urlopen
 from lxml import etree

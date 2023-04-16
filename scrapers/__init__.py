@@ -1,0 +1,19 @@
+from logger import get_current_logger
+from scrapers.websites_scrapers.utils.exceptions import UnknownWebsiteScraperException
+from scrapers.websites_scrapers.website_scraper_base import WebsiteScraperBase
+
+SCRAPERS = {}
+
+
+def websites_scrapers_factory(scraper_name: str, *args, **kwargs) -> WebsiteScraperBase:
+    logger = get_current_logger()
+    try:
+        return SCRAPERS[scraper_name](*args, **kwargs)
+    except KeyError:
+        desc = f"Cannot find scraper name: `{scraper_name}` in {SCRAPERS}"
+        logger.error(desc)
+        raise UnknownWebsiteScraperException(desc)
+    except Exception as e:
+        desc = f"Error getting website scraper instance of name: `{scraper_name}` - {str(e)}"
+        logger.error(desc)
+        raise e

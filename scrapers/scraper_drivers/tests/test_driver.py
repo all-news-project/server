@@ -4,7 +4,7 @@ from unittest import TestCase
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
-from scrapers.scraper_component import get_scraping_driver
+from scrapers.scraper_drivers import get_scraping_driver
 
 
 class TestChromeDriver(TestCase):
