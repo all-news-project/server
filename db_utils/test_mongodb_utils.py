@@ -29,7 +29,7 @@ class TestMongoDBUtils(TestCase):
     def test_insert_many(self):
         try:
             db_utils = get_current_db_driver()
-            article_id = "article_test_ids"
+            article_id = "article_test_id"
             url = 'test_article.com'
             website = 'cnn'
             title = "Test Article Title"
@@ -49,7 +49,9 @@ class TestMongoDBUtils(TestCase):
                     publishing_time=publishing_time, collecting_time=collecting_time
                 )
             ]
-            return db_utils.insert_many(table_name='articles', data=test_articles.convert_to_dict())
+            return db_utils.insert_many(table_name='articles',
+                                        data_list=[article.convert_to_dict() for article in test_articles])
+
         except Exception as e:
             print(f"test_insert_one: {e}")
             self.fail()
@@ -57,7 +59,8 @@ class TestMongoDBUtils(TestCase):
     def test_get_one(self):
         try:
             db_utils = get_current_db_driver()
-            data_filter = {'article_id': '05504dac-cb0f-410c-bce4-713482a59e42'}
+            id = self.test_insert_one()
+            data_filter = {'_id': id}
             article_dict = db_utils.get_one(table_name='articles', data_filter=data_filter)
             if not article_dict:
                 self.fail()
@@ -68,12 +71,14 @@ class TestMongoDBUtils(TestCase):
             print(f"test_insert_one: {e}")
             self.fail()
 
+    # TODO:need to fix
     def test_get_many(self):
         try:
             db_utils = get_current_db_driver()
             ids = self.test_insert_many()
-            data_filter = {'article_id': ids}
-            articles_dict = db_utils.get_many(table_name='articles', data_filter=data_filter)
+            # ids_to_find = ["Test_art_many_1", "Test_art_many_2", "Test_art_many_3"]
+            articles_dict = db_utils.get_many(table_name='articles',
+                                              data_filter={"article_id": {"$in": ["article_test_id"]}})  # {"article_id": ids_to_find})
             if not articles_dict:
                 self.fail()
             articles = get_db_object_from_dict(object_dict=articles_dict, class_instance=Article)
@@ -111,7 +116,7 @@ class TestMongoDBUtils(TestCase):
         try:
             db_utils = get_current_db_driver()
             _id = self.test_insert_one()
-            data_filter = {'article_id': _id}
+            data_filter = {'_id': _id}
             flag = db_utils.exists(table_name='articles', data_filter=data_filter)
             if not flag:
                 self.fail()
@@ -122,10 +127,10 @@ class TestMongoDBUtils(TestCase):
     def test_count(self):
         try:
             db_utils = get_current_db_driver()
-            _id = self.test_insert_many()
-            data_filter = {'article_id': _id}
+            _ids = self.test_insert_many()
+            data_filter = {'_id': {"$in": _ids}}
             flag = db_utils.count(table_name='articles', data_filter=data_filter)
-            if flag == 0:
+            if flag == 0 or flag is None:
                 self.fail()
         except Exception as e:
             print(f"test_delete_one: {e}")

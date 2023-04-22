@@ -195,7 +195,7 @@ class DBUtils(DBUtilsInterface):
     @log_function
     def get_many(self, table_name: str, data_filter: dict) -> List[dict]:
         try:
-            self.logger.debug(f"Trying to get one data from table: '{table_name}', db: '{self.DB_NAME}'")
+            self.logger.debug(f"Trying to get many data from table: '{table_name}', db: '{self.DB_NAME}'")
             res = self._db[table_name].find(data_filter)
             if res:
                 object_id = res.cursor_id
