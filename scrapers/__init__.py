@@ -1,8 +1,9 @@
 from logger import get_current_logger
+from scrapers.websites_scrapers.bbc_scraper import BBCScraper
 from scrapers.websites_scrapers.utils.exceptions import UnknownWebsiteScraperException
 from scrapers.websites_scrapers.website_scraper_base import WebsiteScraperBase
 
-SCRAPERS = {}  # example: "bbc": BBCWebsiteScraper
+SCRAPERS = {"bbc": BBCScraper}  # example: "bbc": BBCWebsiteScraper
 
 
 def websites_scrapers_factory(scraper_name: str, *args, **kwargs) -> WebsiteScraperBase:
@@ -17,7 +18,7 @@ def websites_scrapers_factory(scraper_name: str, *args, **kwargs) -> WebsiteScra
     try:
         return SCRAPERS[scraper_name](*args, **kwargs)
     except KeyError:
-        desc = f"Cannot find scraper name: `{scraper_name}` in {SCRAPERS}"
+        desc = f"Cannot find scraper name: `{scraper_name}` in {SCRAPERS.keys()}"
         logger.error(desc)
         raise UnknownWebsiteScraperException(desc)
     except Exception as e:

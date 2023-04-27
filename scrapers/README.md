@@ -1,6 +1,6 @@
 # Scraper Component
 
-> ### <i>Scraper Flow</i>
+> ## <i>Scraper Flow</i>
 
 ```mermaid
 graph TD;
@@ -10,17 +10,26 @@ a{ scraping-task } -->scrape-new-articles-urls
 scrape-new-articles-urls --> scrape-articles-content;
 ```
 
-> ### <i>Running Scraping Task</i>
+> ## <i>Running Scraping Task</i>
 
-1. get `pending` collecting task from db
-2. get website scraper instance using factory
-3. init scraper driver
-4. get url page
-5. get urls list
-6. filter only new urls
-7. for each url:
-    1. get to url page
-    2. collect article content
-    3. save to db
-    4. update task list of collected articles *
+### Type of task - `collect_urls`
+
+1. get `pending` collecting task from db - if not found pending - get by `failed` status
+2. set task status as `running`
+3. get website scraper instance using factory
+4. init scraper driver
+5. get url page
+6. get urls list
+7. filter only new urls
+8. for each new url - create new task for collecting content
+
+### Type of task - `collect_article`
+
+1. get `pending` collecting task from db - if not found pending - get by `failed` status
+2. set task status as `running`
+3. get website scraper instance using factory
+4. init scraper driver
+5. get url page (article)
+6. collect article content
+7. save to db
 8. update task as `succeeded` or `failed`

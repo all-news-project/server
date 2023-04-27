@@ -1,15 +1,14 @@
 from datetime import datetime
 from typing import List
 
+from db_driver.db_objects.article import Article
+
 
 class WebsiteScraperBase:
-    def get_home_page(self):
+    def _get_home_page(self):
         raise NotImplementedError
 
-    def get_new_article_urls_from_home_page(self):
-        raise NotImplementedError
-
-    def get_to_article_page(self, url: str):
+    def _get_article_page(self, url: str):
         raise NotImplementedError
 
     def _get_article_title(self) -> str:
@@ -31,4 +30,10 @@ class WebsiteScraperBase:
 
     def _get_article_state(self) -> str:
         # default return - 'global'
+        raise NotImplementedError
+
+    def get_new_article_urls_from_home_page(self) -> List[str]:
+        raise NotImplementedError
+
+    def get_article(self, url: str) -> Article:
         raise NotImplementedError
