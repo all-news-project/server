@@ -8,7 +8,7 @@ from db_driver.insterfaces.interface_db_driver import DBDriverInterface
 from db_driver.utils.exceptions import InsertDataDBException, DataNotFoundDBException, DeleteDataDBException, \
     UpdateDataDBException
 from logger import get_current_logger, log_function
-from server_utils.db_utils import get_mongodb_connection_string
+from server_utils.db_utils.validation_utils import get_mongodb_connection_string
 
 
 class MongoDBDriver(DBDriverInterface):
@@ -116,7 +116,7 @@ class MongoDBDriver(DBDriverInterface):
     @log_function
     def update_one(self, table_name: str, data_filter: dict, new_data: dict) -> ObjectId:
         try:
-            self.logger.debug(f"Trying to delete one data from table: '{table_name}', db: '{self.DB_NAME}'")
+            self.logger.debug(f"Trying to update one data from table: '{table_name}', db: '{self.DB_NAME}'")
             res = self.__db[table_name].update_one(data_filter, {"$set": new_data})
             if res:
                 object_id = res.raw_result.get('_id')

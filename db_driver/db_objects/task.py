@@ -12,7 +12,7 @@ class Task:
     domain: str
     status: str
     type: str
-    status_timestamp: List[Timestamp] = field(default_factory=lambda: [])
+    status_timestamp: List[Timestamp | dict] = field(default_factory=lambda: [])
     creation_time: datetime.datetime = None
     collecting_time: datetime.datetime = None  # todo: check if needed
 

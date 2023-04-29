@@ -1,18 +1,15 @@
-from datetime import datetime
 from time import sleep
 from typing import List
-from uuid import uuid4
 
 from pymongo.errors import ConnectionFailure
 
 from db_driver import get_current_db_driver
-from db_driver.db_objects.db_objects_utils import get_db_object_from_dict
 from db_driver.db_objects.task import Task
 from db_driver.utils.consts import DBConsts
-from db_driver.utils.exceptions import DataNotFoundDBException, UpdateDataDBException, InsertDataDBException
-from logger import get_current_logger
+from logger import get_current_logger, log_function
 from scrapers import websites_scrapers_factory
 from scrapers.websites_scrapers.utils.consts import MainConsts
+from server_utils.db_utils.task_utils import TaskUtils
 
 
 class LogicScaper:
@@ -21,31 +18,9 @@ class LogicScaper:
     def __init__(self):
         self.logger = get_current_logger()
         self._db = get_current_db_driver()
+        self.task_utils = TaskUtils()
 
-    def _get_task_by_status(self, status: str):
-        try:
-            task: dict = self._db.get_one(table_name=DBConsts.TASKS_TABLE_NAME, data_filter={"status": status})
-            task_object: Task = get_db_object_from_dict(task, Task)
-            return task_object
-        except DataNotFoundDBException:
-            return None
-
-    def _get_new_task(self) -> Task:
-        for status in ["pending", "failed"]:
-            task = self._get_task_by_status(status=status)
-            if task:
-                return task
-
-    def _update_task_status(self, task_id: str, status: str):
-        try:
-            data_filter = {"task_id": task_id}
-            new_data = {"status": status}
-            self._db.update_one(table_name=DBConsts.TASKS_TABLE_NAME, data_filter=data_filter, new_data=new_data)
-        except UpdateDataDBException as e:
-            desc = f"Error updating task as `running`"
-            self.logger.error(desc)
-            raise e
-
+    @log_function
     def _filter_only_not_exits_articles(self, urls: List[str]) -> List[str]:
         data_filter = {"url": {"$in": urls}}
         exists_articles = self._db.get_many(table_name=DBConsts.ARTICLE_TABLE_NAME, data_filter=data_filter)
@@ -53,50 +28,47 @@ class LogicScaper:
         new_articles = list(set(urls).difference(exists_articles_urls))
         return new_articles
 
-    def _create_new_task(self, url: str, domain: str):
-        for trie in range(MainConsts.TIMES_TRY_CREATE_TASK):
+    @log_function
+    def _create_collecting_article_tasks(self, urls: List[str], domain: str):
+        for url in urls:
             try:
-                task_data = {
-                    "task_id": str(uuid4()),
-                    "url": url,
-                    "domain": domain,
-                    "status": "pending",
-                    "type": MainConsts.COLLECT_ARTICLE,
-                    "creation_time": datetime.now()
-                }
-                new_task: dict = Task(**task_data).convert_to_dict()
-                inserted_id = self._db.insert_one(table_name=DBConsts.TASKS_TABLE_NAME, data=new_task)
-                self.logger.info(f"Created new task inserted_id: {inserted_id}")
-                return
+                self.task_utils.create_new_task(url=url, domain=domain, task_type=MainConsts.COLLECT_ARTICLE)
             except Exception as e:
-                self.logger.warning(f"Error create new task NO. {trie}/{MainConsts.TIMES_TRY_CREATE_TASK} - {str(e)}")
-                continue
-        desc = f"Error creating new task into db after {MainConsts.TIMES_TRY_CREATE_TASK} tries"
-        raise InsertDataDBException(desc)
+                desc = f"Error creating new task with type: {MainConsts.COLLECT_ARTICLE} - {str(e)}"
+                self.logger.error(desc)
 
-    def _handle_task(self, task: Task):
-        if task.type == MainConsts.COLLECT_URLS:
-            website_scraper = websites_scrapers_factory(scraper_name=task.domain)
-            urls = website_scraper.get_new_article_urls_from_home_page()
-            urls = self._filter_only_not_exits_articles(urls=urls)
-            for url in urls:
-                try:
-                    self._create_new_task(url=url, domain=task.domain)
-                except Exception as e:
-                    desc = f"Error creating new task with type: {MainConsts.COLLECT_ARTICLE} - {str(e)}"
-                    self.logger.error(desc)
-        elif task.type == MainConsts.COLLECT_ARTICLE:
-            pass
+    @log_function
+    def _handle_task(self, task: Task) -> bool:
+        try:
+            if task.type == MainConsts.COLLECT_URLS:
+                website_scraper = websites_scrapers_factory(scraper_name=task.domain)
+                urls = website_scraper.get_new_article_urls_from_home_page()
+                urls = self._filter_only_not_exits_articles(urls=urls)
+                self._create_collecting_article_tasks(urls=urls, domain=task.domain)
+                self.logger.info(f"Done handle task of type: `{task.type}`")
+            elif task.type == MainConsts.COLLECT_ARTICLE:
+                pass
+        except Exception as e:
+            desc = f"Failed run task task_id: `{task.task_id}`, type: `{task.type}` - {str(e)}"
+            self.logger.error(desc)
+            return False
+        return True
 
+    @log_function
     def run(self):
         while True:
             try:
-                task = self._get_new_task()
+                task = self.task_utils.get_new_task()
                 if task:
-                    self._update_task_status(task_id=task.task_id, status="running")
-                    self._handle_task(task=task)
+                    self.logger = get_current_logger(task_id=task.task_id, task_type=task.type)
+                    self.task_utils.update_task_status(task=task, status="running")
+                    is_task_succeeded = self._handle_task(task=task)
+                    if is_task_succeeded:
+                        self.task_utils.update_task_status(task=task, status="succeeded")
+                    else:
+                        self.task_utils.update_task_status(task=task, status="failed")
                 else:
-                    self.logger.debug(f"Couldn't find task, sleeping for {self.SLEEPING_TIME / 60} minutes")
+                    self.logger.warning(f"Couldn't find task, sleeping for {self.SLEEPING_TIME / 60} minutes")
                     sleep(self.SLEEPING_TIME)
             except ConnectionFailure as e:
                 self.logger.warning(f"Error connecting to db, initialize the db again - {str(e)}")

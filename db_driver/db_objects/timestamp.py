@@ -6,8 +6,7 @@ from typing import List, Optional
 @dataclass
 class Timestamp:
     status: str
-    start_time: datetime.datetime
-    end_time: datetime.datetime
+    time_changed: datetime.datetime
 
     def __repr__(self) -> str:
         string = ''
