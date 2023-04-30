@@ -19,14 +19,15 @@ class TaskUtils:
     def create_new_task(self, url: str, domain: str, task_type: str):
         for trie in range(TaskConsts.TIMES_TRY_CREATE_TASK):
             try:
+                creation_time = datetime.now()
                 task_data = {
                     "task_id": str(uuid4()),
                     "url": url,
                     "domain": domain,
-                    "status": "pending",
+                    "status": TaskConsts.PENDING,
                     "type": task_type,
-                    "status_timestamp": [Timestamp(status="pending", time_changed=datetime.now())],
-                    "creation_time": datetime.now()
+                    "status_timestamp": [Timestamp(status=TaskConsts.PENDING, time_changed=creation_time)],
+                    "creation_time": creation_time
                 }
                 new_task: dict = Task(**task_data).convert_to_dict()
                 inserted_id = self._db.insert_one(table_name=TaskConsts.TASKS_TABLE_NAME, data=new_task)
@@ -62,7 +63,7 @@ class TaskUtils:
 
     @log_function
     def get_new_task(self) -> Task:
-        for status in ["pending", "failed"]:
+        for status in [TaskConsts.PENDING, TaskConsts.FAILED]:
             task = self._get_task_by_status(status=status)
             if task:
                 return task

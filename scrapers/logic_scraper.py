@@ -9,6 +9,7 @@ from db_driver.utils.consts import DBConsts
 from logger import get_current_logger, log_function
 from scrapers import websites_scrapers_factory
 from scrapers.websites_scrapers.utils.consts import MainConsts
+from server_utils.db_utils.db_utils_consts import TaskConsts
 from server_utils.db_utils.task_utils import TaskUtils
 
 
@@ -61,12 +62,12 @@ class LogicScaper:
                 task = self.task_utils.get_new_task()
                 if task:
                     self.logger = get_current_logger(task_id=task.task_id, task_type=task.type)
-                    self.task_utils.update_task_status(task=task, status="running")
+                    self.task_utils.update_task_status(task=task, status=TaskConsts.RUNNING)
                     is_task_succeeded = self._handle_task(task=task)
                     if is_task_succeeded:
-                        self.task_utils.update_task_status(task=task, status="succeeded")
+                        self.task_utils.update_task_status(task=task, status=TaskConsts.SUCCEEDED)
                     else:
-                        self.task_utils.update_task_status(task=task, status="failed")
+                        self.task_utils.update_task_status(task=task, status=TaskConsts.FAILED)
                 else:
                     self.logger.warning(f"Couldn't find task, sleeping for {self.SLEEPING_TIME / 60} minutes")
                     sleep(self.SLEEPING_TIME)
