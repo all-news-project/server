@@ -9,13 +9,13 @@
     by checking the similarity rate of every article in each cluster"""
 from transformers import DistilBertTokenizer, DistilBertModel
 
-from db_utils import Article
-from db_utils.db_objects.cluster import Cluster
+from db_driver.db_objects.article import Article
+from db_driver.db_objects.cluster import Cluster
 from logger import get_current_logger, log_function
-from nlp_models.nlp_utils.cluster_utils import cluster_similarity, update_cluster, create_new_cluster
+from nlp_models.nlp_utils.cluster_utils import cluster_similarity
+from db_driver.utils.cluster_utils import create_new_cluster,update_cluster
 
 logger = get_current_logger()
-from db_utils import get_current_db_driver
 
 
 @log_function

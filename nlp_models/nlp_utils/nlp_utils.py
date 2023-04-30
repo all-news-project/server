@@ -1,13 +1,7 @@
-# To determine whether two texts are written about the same subject using natural language processing (NLP) techniques, you can use a text similarity model. This type of model takes two texts as input and outputs a score indicating how similar the texts are in terms of their subject matter.
-
-# Here is an example of how you might use a pre-trained text similarity model, such as BERT, to check whether two texts are written about the same subject:
-
-# Copy code
 import datetime
 import os
 import uuid
 
-import db_utils
 from logger import get_current_logger, log_function
 import transformers
 from transformers import DistilBertModel, DistilBertTokenizer, T5Tokenizer, T5ForConditionalGeneration, BertModel, \
@@ -55,7 +49,7 @@ def compare_text(sentences: list[str]):
 """"This function uses the T5 model and tokenizer inorder to encode and decode the text
 to get the most important features and summarize the text"""
 
-
+@log_function
 def __text_sum(text: str, model: T5ForConditionalGeneration, tokenizer: T5Tokenizer, num_beams: int = 4,
                no_repeat_ngram_size: int = 2, min_length: int = 30,
                max_length: int = 100,
