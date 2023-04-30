@@ -3,8 +3,6 @@ from logger import get_current_logger, log_function
 from nlp_models.exceptions import SimilarityNotFoundException
 from nlp_models.nlp_utils.nlp_utils import compare_text
 
-logger = get_current_logger()
-
 """This function is used to check the similarity between unclassified article and a specific cluster's articles"""
 
 
@@ -28,7 +26,7 @@ def cluster_similarity(cluster_id: str, new_article_id: str) -> float:
             logger.debug(f"High similarity with article,average{avg_rate}")
         elif sim_rate > 60 and avg_rate > 70:
             logger.debug(f"Low similarity with article,average{avg_rate}")
-        final_result = (avg_rate + sim_rate) / 2
+        final_result=(avg_rate + sim_rate) / 2
         logger.debug(f"similarity rate to cluster is {final_result}")
         return final_result
     else:
