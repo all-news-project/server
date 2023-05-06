@@ -85,7 +85,7 @@ class DBUtils(DBUtilsInterface):
         try:
             self.logger.debug(f"Trying to delete one data from table: '{table_name}', db: '{self.DB_NAME}'")
             res = self._db[table_name].delete_one(data_filter)
-            if res:
+            if res and res.deleted_count>0:
                 object_id = res.raw_result.get('_id')
                 self.logger.info(
                     f"Deleted data from db: '{self.DB_NAME}', table_name: '{table_name}', id: '{object_id}'")
@@ -103,7 +103,7 @@ class DBUtils(DBUtilsInterface):
         try:
             self.logger.debug(f"Trying to delete collection of data from table: '{table_name}', db: '{self.DB_NAME}'")
             res = self._db[table_name].delete_many(data_filter)
-            if res:
+            if res.deleted_count and res.deleted_count>0:
                 object_id = res.raw_result.get('_id')
                 self.logger.info(
                     f"Deleted {res.deleted_count} records from db: '{self.DB_NAME}', table_name: '{table_name}', id: '{object_id}'")
@@ -127,11 +127,11 @@ class DBUtils(DBUtilsInterface):
                     f"updated one data from db: '{self.DB_NAME}', table_name: '{table_name}', id: '{object_id}'")
                 return object_id
             else:
-                desc = f"Error delete data with filter: {data_filter}, table: '{table_name}, db: {self.DB_NAME}'"
+                desc = f"Error update data with filter: {data_filter}, table: '{table_name}, db: {self.DB_NAME}'"
                 self.logger.error(desc)
                 raise DeleteDataDBException(desc)
         except Exception as e:
-            self.logger.error(f"Error delete one from db: {str(e)}")
+            self.logger.error(f"Error update one from db: {str(e)}")
             raise e
 
     @log_function
@@ -150,7 +150,7 @@ class DBUtils(DBUtilsInterface):
                 self.logger.error(desc)
                 raise UpdateDataDBException(desc)
         except Exception as e:
-            self.logger.error(f"Error delete one from db: {str(e)}")
+            self.logger.error(f"Error update many from db: {str(e)}")
             raise e
 
     @log_function
@@ -176,7 +176,7 @@ class DBUtils(DBUtilsInterface):
     def exists(self, table_name: str, data_filter: dict) -> bool:
         try:
             self.logger.debug(
-                f"Trying to count table: '{table_name}', db: '{self.DB_NAME}'")
+                f"Trying to find row table: '{table_name}', db: '{self.DB_NAME}'")
             res = self.count(table_name, data_filter)
             if res > 0:
                 # object_id = res.raw_result.get('_id')
@@ -189,7 +189,7 @@ class DBUtils(DBUtilsInterface):
                 return False
                 # raise UpdateDataDBException(desc)
         except Exception as e:
-            self.logger.error(f"Error counting from db: {str(e)}")
+            self.logger.error(f"Error exists from db: {str(e)}")
             return False
 
     @log_function
@@ -197,7 +197,7 @@ class DBUtils(DBUtilsInterface):
         try:
             self.logger.debug(f"Trying to get many data from table: '{table_name}', db: '{self.DB_NAME}'")
             res = self._db[table_name].find(data_filter)
-            if res:
+            if res and res.retrieved>0:
                 object_id = res.cursor_id
                 self.logger.info(f"Got data from db: '{self.DB_NAME}', table_name: '{table_name}', id: '{object_id}'")
                 return list(dict(res))
