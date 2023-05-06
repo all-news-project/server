@@ -2,6 +2,7 @@ import datetime
 from dataclasses import dataclass, asdict
 from typing import List, Optional
 
+#from db_driver.db_objects.cluster import Cluster
 
 
 @dataclass
@@ -11,8 +12,8 @@ class Article:
     website: str
     title: str
     content: str
+    summary: str
     publishing_time: datetime.datetime
-    summary: str = None
     collecting_time: datetime.datetime = None
     cluster_id: str = None
     category: Optional[str] = None
