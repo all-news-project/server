@@ -1,6 +1,5 @@
 from functools import cache
-
-from logger.wise_logger import WISELogger
+from logger.server_logger import ServerLogger
 
 
 @cache
@@ -9,7 +8,7 @@ def get_current_logger(*args, **kwargs):
     Singleton logger
     :return:
     """
-    return WISELogger(*args, **kwargs)
+    return ServerLogger(*args, **kwargs)
 
 
 def is_method(args) -> bool:
@@ -21,7 +20,7 @@ def is_method(args) -> bool:
 
 
 def log_function(func):
-    logger = WISELogger()
+    logger = get_current_logger()
 
     def inner(*args, **kwargs):
         if is_method(args=args):
