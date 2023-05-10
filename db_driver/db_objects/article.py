@@ -10,12 +10,11 @@ class Article:
     domain: str
     title: str
     content: str
-    publishing_time: datetime.datetime
     collecting_time: datetime.datetime
+    publishing_time: Optional[datetime.datetime] = None
+    cluster_id: Optional[str] = None
     task_id: Optional[str] = None
-    category: Optional[str] = None
     images: Optional[List[str]] = None
-    state: Optional[str] = None
 
     def __repr__(self) -> str:
         string = ''

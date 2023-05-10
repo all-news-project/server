@@ -15,7 +15,8 @@ class TaskConsts:
 
 
 class ArticleConsts:
-    pass
+    TIMES_TRY_INSERT_ARTICLE = int(os.getenv(key="TIMES_TRY_INSERT_ARTICLE", default=3))
+    TIMES_TRY_UPDATE_CLUSTER_ID = int(os.getenv(key="TIMES_TRY_UPDATE_CLUSTER_ID", default=3))
 
 
 class ClusterConsts:

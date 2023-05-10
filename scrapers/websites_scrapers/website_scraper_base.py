@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
-from typing import List
+from typing import List, Union
+from uuid import uuid4
 
 from selenium.common import TimeoutException
 
@@ -61,11 +62,23 @@ class WebsiteScraperBase:
         if raise_on_fail:
             raise ErrorClickElementException(f"Failed click in element after {times_to_try + 1} tries")
 
-    def _get_home_page(self):
-        raise NotImplementedError
-
-    def _get_article_page(self, url: str):
-        raise NotImplementedError
+    @log_function
+    def get_article(self, task: Task) -> Article:
+        self._get_page(url=task.url)
+        self._check_unwanted_article()
+        self._close_popups_if_needed()
+        data = {
+            "article_id": str(uuid4()),
+            "url": task.url,
+            "domain": task.domain,
+            "title": self._get_article_title(),
+            "content": self._get_article_content_text(),
+            "publishing_time": self._get_article_publishing_time(),
+            "collecting_time": datetime.now(),
+            "task_id": task.task_id,
+            "images": self._get_article_image_urls()
+        }
+        return Article(**data)
 
     def _get_article_title(self) -> str:
         raise NotImplementedError
@@ -73,23 +86,17 @@ class WebsiteScraperBase:
     def _get_article_content_text(self) -> str:
         raise NotImplementedError
 
-    def _get_article_publishing_time(self) -> datetime:
-        raise NotImplementedError
-
-    def _get_article_category(self) -> str:
-        # default return - 'general'
+    def _get_article_publishing_time(self) -> Union[datetime, object]:
         raise NotImplementedError
 
     def _get_article_image_urls(self) -> List[str]:
-        # default return - empty list
         raise NotImplementedError
 
-    def _get_article_state(self) -> str:
-        # default return - 'global'
+    def _check_unwanted_article(self):
+        raise NotImplementedError
+
+    def _close_popups_if_needed(self):
         raise NotImplementedError
 
     def get_new_article_urls_from_home_page(self) -> List[str]:
-        raise NotImplementedError
-
-    def get_article(self, task: Task) -> Article:
         raise NotImplementedError

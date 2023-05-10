@@ -1,18 +1,15 @@
 import re
 from datetime import datetime
-from typing import List
-from uuid import uuid4
+from typing import List, Union
 
-from selenium.common import TimeoutException
+from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
-from db_driver.db_objects.article import Article
-from db_driver.db_objects.task import Task
 from logger import log_function
 from scrapers.websites_scrapers.utils.exceptions import UnwantedArticleException
 from scrapers.websites_scrapers.utils.xpaths import BBCXPaths
 from scrapers.websites_scrapers.website_scraper_base import WebsiteScraperBase
-from scrapers.websites_scrapers.utils.consts import ScraperConsts, MainConsts
+from scrapers.websites_scrapers.utils.consts import ScraperConsts, BBCConsts
 
 
 class BBCScraper(WebsiteScraperBase):
@@ -20,37 +17,44 @@ class BBCScraper(WebsiteScraperBase):
         super().__init__()
         self._homepage_url = ScraperConsts.BBC_HOME_PAGE
 
+    @log_function
     def _get_article_title(self) -> str:
-        return self._driver.get_title()
+        return self._driver.get_title().replace(BBCConsts.TITLE_FILTER, "")
 
+    @log_function
     def _get_article_content_text(self) -> str:
-        text_content = ""
         paragraphs = self._driver.find_elements(by=By.XPATH, value=BBCXPaths.text_block)
         if not paragraphs:
-            self.logger.error(f"Error find elements: ")
-            return text_content
+            desc = f"Error find content text of article, element value: `{BBCXPaths.text_block}`"
+            self.logger.error(desc)
+            raise NoSuchElementException(desc)
         else:
             return " ".join([paragraph.get_text() for paragraph in paragraphs])
 
-    def _get_article_publishing_time(self) -> datetime:
-        raise NotImplementedError
+    @log_function
+    def _get_article_publishing_time(self) -> Union[datetime, object]:
+        try:
+            time_element = self._driver.find_element(by=By.XPATH, value=BBCXPaths.publishing_time_element)
+            publishing_timestamp = time_element.get_attribute("datetime")
+            publishing_datetime = datetime.strptime(publishing_timestamp, BBCConsts.PUBLISHING_FORMAT)
+            return publishing_datetime
+        except Exception as e:
+            self.logger.warning(f"Error collecting publishing time - {e}")
+            return None
 
-    def _get_article_category(self) -> str:
-        # default return - 'general'
-        raise NotImplementedError
-
+    @log_function
     def _get_article_image_urls(self) -> List[str]:
-        # default return - empty list
-        raise NotImplementedError
+        image_urls = []
+        images = self._driver.find_elements(by=By.XPATH, value=BBCXPaths.article_image)
+        for image in images:
+            image_urls.append(image.get_attribute("src"))
+        return image_urls
 
-    def _get_article_state(self) -> str:
-        # default return - 'global'
-        raise NotImplementedError
-
+    @log_function
     def _check_unwanted_article(self):
-        self.logger.debug(f"_check_unwanted_article, current -> {self._driver.get_current_url()}")
+        self.logger.debug(f"_check_unwanted_article, current -> `{self._driver.get_current_url()}`")
         if "/av/" in self._driver.get_current_url():
-            raise UnwantedArticleException
+            raise UnwantedArticleException(f"Article is unwanted -> `{self._driver.get_current_url()}`")
 
     @log_function
     def _close_popups_if_needed(self):
@@ -60,32 +64,17 @@ class BBCScraper(WebsiteScraperBase):
         self.logger.debug(f"Trying to click close popups if needed")
         self._try_click_element(by=By.XPATH, value=BBCXPaths.popup_close_button, raise_on_fail=False)
 
+    @log_function
     def get_new_article_urls_from_home_page(self) -> List[str]:
         self._get_page(self._homepage_url)
         articles_urls = set()
-        articles_elements = self._driver.find_elements(by=By.XPATH, value="//div[contains(@class, 'gel-layout__item')]/.//a[contains(@href, '/news/') or contains(@href, '/article/')]")
+        articles_elements = self._driver.find_elements(by=By.XPATH, value=BBCXPaths.articles_elements)
         for element in articles_elements:
             href = element.get_attribute("href")
-            # todo: order filtering
-            if self._homepage_url in href and bool(re.search(r'\d', href) and not ("#comp" in href)) and not ("/av/" in href):
+            is_url_filter_bad = any([url_filter in href for url_filter in BBCConsts.NEW_ARTICLE_URL_FILTER])
+            if is_url_filter_bad:
+                continue
+
+            if self._homepage_url in href and bool(re.search(r'\d', href)):
                 articles_urls.add(href)
         return list(articles_urls)
-
-    def get_article(self, task: Task) -> Article:
-        self._get_page(url=task.url)
-        self._check_unwanted_article()
-        self._close_popups_if_needed()
-
-        article_id = uuid4()
-        url = task.url
-        domain = task.domain
-        title = self._get_article_title()
-        content = self._get_article_content_text()
-        # publishing_time: datetime.datetime
-        # collecting_time: datetime.datetime
-        # task_id: Optional[str] = None
-        # category: Optional[str] = None
-        # images: Optional[List[str]] = None
-        # state: Optional[str] = None
-        # pass
-        # return

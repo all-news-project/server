@@ -5,6 +5,12 @@ class ScraperConsts:
     BBC_HOME_PAGE = "https://www.bbc.com/news/"
 
 
+class BBCConsts:
+    NEW_ARTICLE_URL_FILTER = ["#comp", "/av/"]
+    PUBLISHING_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
+    TITLE_FILTER = " - BBC News"
+
+
 class MainConsts:
     COLLECT_URLS = "collect_urls"
     COLLECT_ARTICLE = "collect_article"

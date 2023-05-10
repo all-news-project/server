@@ -10,6 +10,7 @@ from logger import get_current_logger, log_function
 from scrapers import websites_scrapers_factory
 from scrapers.websites_scrapers.utils.consts import MainConsts
 from scrapers.websites_scrapers.utils.exceptions import UnwantedArticleException
+from server_utils.db_utils.article_utils import ArticleUtils
 from server_utils.db_utils.task_utils import TaskUtils
 from server_utils.server_consts import ScheduleConsts, TaskConsts
 
@@ -19,10 +20,12 @@ class LogicScaper:
         self.logger = get_current_logger()
         self._db = get_current_db_driver()
         self.task_utils = TaskUtils()
+        self.article_utils = ArticleUtils()
 
     @log_function
     def _filter_only_not_exits_articles(self, urls: List[str]) -> List[str]:
         data_filter = {"url": {"$in": urls}}
+        # todo: also check with `unwanted` tasks status
         exists_articles = self._db.get_many(table_name=DBConsts.ARTICLE_TABLE_NAME, data_filter=data_filter)
         exists_articles_urls = {exists_article.get("url") for exists_article in exists_articles}
         new_articles = list(set(urls).difference(exists_articles_urls))
@@ -45,10 +48,12 @@ class LogicScaper:
                 urls = website_scraper.get_new_article_urls_from_home_page()
                 urls = self._filter_only_not_exits_articles(urls=urls)
                 self._create_collecting_article_tasks(urls=urls, domain=task.domain)
-                self.logger.info(f"Done handle task of type: `{task.type}`")
+
             elif task.type == MainConsts.COLLECT_ARTICLE:
                 article = website_scraper.get_article(task=task)
+                self.article_utils.insert_article(article=article)
 
+            self.logger.info(f"Done handle task of type: `{task.type}`")
         except UnwantedArticleException:
             desc = f"Article is Unwanted: `{task.task_id}` change task status to: `{TaskConsts.UNWANTED}`"
             self.logger.warning(desc)
@@ -79,8 +84,3 @@ class LogicScaper:
                 self._db = get_current_db_driver()
             except Exception as e:
                 self.logger.warning(f"Error handle task - {str(e)}")
-
-
-if __name__ == '__main__':
-    logic_scraper = LogicScaper()
-    logic_scraper.run()
