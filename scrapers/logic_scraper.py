@@ -9,13 +9,12 @@ from db_driver.utils.consts import DBConsts
 from logger import get_current_logger, log_function
 from scrapers import websites_scrapers_factory
 from scrapers.websites_scrapers.utils.consts import MainConsts
-from server_utils.db_utils.db_utils_consts import TaskConsts
+from scrapers.websites_scrapers.utils.exceptions import UnwantedArticleException
 from server_utils.db_utils.task_utils import TaskUtils
+from server_utils.server_consts import ScheduleConsts, TaskConsts
 
 
 class LogicScaper:
-    SLEEPING_TIME = 60 * 15
-
     def __init__(self):
         self.logger = get_current_logger()
         self._db = get_current_db_driver()
@@ -39,21 +38,28 @@ class LogicScaper:
                 self.logger.error(desc)
 
     @log_function
-    def _handle_task(self, task: Task) -> bool:
+    def _handle_task(self, task: Task) -> str:
         try:
+            website_scraper = websites_scrapers_factory(scraper_name=task.domain)
             if task.type == MainConsts.COLLECT_URLS:
-                website_scraper = websites_scrapers_factory(scraper_name=task.domain)
                 urls = website_scraper.get_new_article_urls_from_home_page()
                 urls = self._filter_only_not_exits_articles(urls=urls)
                 self._create_collecting_article_tasks(urls=urls, domain=task.domain)
                 self.logger.info(f"Done handle task of type: `{task.type}`")
             elif task.type == MainConsts.COLLECT_ARTICLE:
-                pass
+                article = website_scraper.get_article(task=task)
+
+        except UnwantedArticleException:
+            desc = f"Article is Unwanted: `{task.task_id}` change task status to: `{TaskConsts.UNWANTED}`"
+            self.logger.warning(desc)
+            return TaskConsts.UNWANTED
+
         except Exception as e:
             desc = f"Failed run task task_id: `{task.task_id}`, type: `{task.type}` - {str(e)}"
             self.logger.error(desc)
-            return False
-        return True
+            return TaskConsts.FAILED
+
+        return TaskConsts.SUCCEEDED
 
     @log_function
     def run(self):
@@ -63,14 +69,11 @@ class LogicScaper:
                 if task:
                     self.logger = get_current_logger(task_id=task.task_id, task_type=task.type)
                     self.task_utils.update_task_status(task=task, status=TaskConsts.RUNNING)
-                    is_task_succeeded = self._handle_task(task=task)
-                    if is_task_succeeded:
-                        self.task_utils.update_task_status(task=task, status=TaskConsts.SUCCEEDED)
-                    else:
-                        self.task_utils.update_task_status(task=task, status=TaskConsts.FAILED)
+                    task_status = self._handle_task(task=task)
+                    self.task_utils.update_task_status(task=task, status=task_status)
                 else:
-                    self.logger.warning(f"Couldn't find task, sleeping for {self.SLEEPING_TIME / 60} minutes")
-                    sleep(self.SLEEPING_TIME)
+                    self.logger.warning(f"Couldn't find task, sleeping for {ScheduleConsts.SLEEPING_TIME / 60} minutes")
+                    sleep(ScheduleConsts.SLEEPING_TIME)
             except ConnectionFailure as e:
                 self.logger.warning(f"Error connecting to db, initialize the db again - {str(e)}")
                 self._db = get_current_db_driver()

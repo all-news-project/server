@@ -2,7 +2,7 @@ import datetime
 from dataclasses import dataclass, asdict, field
 from typing import List, Optional
 
-from db_driver.db_objects.timestamp import Timestamp
+from db_driver.db_objects.status_timestamp import StatusTimestamp
 
 
 @dataclass
@@ -12,9 +12,8 @@ class Task:
     domain: str
     status: str
     type: str
-    status_timestamp: List[Timestamp | dict] = field(default_factory=lambda: [])
+    status_timestamp: List[StatusTimestamp | dict] = field(default_factory=lambda: [])
     creation_time: datetime.datetime = None
-    collecting_time: datetime.datetime = None  # todo: check if needed
 
     def __repr__(self) -> str:
         string = ''

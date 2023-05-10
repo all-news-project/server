@@ -1,10 +1,9 @@
 import datetime
 from dataclasses import dataclass, asdict
-from typing import List, Optional
 
 
 @dataclass
-class Timestamp:
+class StatusTimestamp:
     status: str
     time_changed: datetime.datetime
 

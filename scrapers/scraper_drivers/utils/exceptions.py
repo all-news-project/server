@@ -26,3 +26,8 @@ class UnknownElementTypeException(Exception):
 class AttributeNameException(Exception):
     def __init__(self, msg: str):
         self.msg = msg
+
+
+class ErrorClickElementException(Exception):
+    def __init__(self, msg: str):
+        self.msg = msg

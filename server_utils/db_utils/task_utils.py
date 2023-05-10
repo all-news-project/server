@@ -4,10 +4,11 @@ from uuid import uuid4
 from db_driver import get_current_db_driver
 from db_driver.db_objects.db_objects_utils import get_db_object_from_dict
 from db_driver.db_objects.task import Task
-from db_driver.db_objects.timestamp import Timestamp
+from db_driver.db_objects.status_timestamp import StatusTimestamp
+from db_driver.utils.consts import DBConsts
 from db_driver.utils.exceptions import InsertDataDBException, UpdateDataDBException, DataNotFoundDBException
 from logger import get_current_logger, log_function
-from server_utils.db_utils.db_utils_consts import TaskConsts
+from server_utils.server_consts import TaskConsts
 
 
 class TaskUtils:
@@ -26,11 +27,11 @@ class TaskUtils:
                     "domain": domain,
                     "status": TaskConsts.PENDING,
                     "type": task_type,
-                    "status_timestamp": [Timestamp(status=TaskConsts.PENDING, time_changed=creation_time)],
+                    "status_timestamp": [StatusTimestamp(status=TaskConsts.PENDING, time_changed=creation_time)],
                     "creation_time": creation_time
                 }
                 new_task: dict = Task(**task_data).convert_to_dict()
-                inserted_id = self._db.insert_one(table_name=TaskConsts.TASKS_TABLE_NAME, data=new_task)
+                inserted_id = self._db.insert_one(table_name=DBConsts.TASKS_TABLE_NAME, data=new_task)
                 self.logger.info(f"Created new task inserted_id: {inserted_id}")
                 return
             except Exception as e:
@@ -43,10 +44,10 @@ class TaskUtils:
     def update_task_status(self, task: Task, status: str):
         try:
             data_filter = {"task_id": task.task_id}
-            new_timestamp = Timestamp(status=status, time_changed=datetime.now())
+            new_timestamp = StatusTimestamp(status=status, time_changed=datetime.now())
             task.status_timestamp.append(new_timestamp.convert_to_dict())
             new_data = {"status": status, "status_timestamp": task.status_timestamp}
-            self._db.update_one(table_name=TaskConsts.TASKS_TABLE_NAME, data_filter=data_filter, new_data=new_data)
+            self._db.update_one(table_name=DBConsts.TASKS_TABLE_NAME, data_filter=data_filter, new_data=new_data)
         except UpdateDataDBException as e:
             desc = f"Error updating task task_id: `{task.task_id}` as status: `{status}`"
             self.logger.error(desc)
@@ -55,7 +56,7 @@ class TaskUtils:
     @log_function
     def _get_task_by_status(self, status: str):
         try:
-            task: dict = self._db.get_one(table_name=TaskConsts.TASKS_TABLE_NAME, data_filter={"status": status})
+            task: dict = self._db.get_one(table_name=DBConsts.TASKS_TABLE_NAME, data_filter={"status": status})
             task_object: Task = get_db_object_from_dict(task, Task)
             return task_object
         except DataNotFoundDBException:
