@@ -8,7 +8,7 @@ from db_driver.insterfaces.interface_db_driver import DBDriverInterface
 from db_driver.utils.exceptions import InsertDataDBException, DataNotFoundDBException, DeleteDataDBException, \
     UpdateDataDBException
 from logger import get_current_logger, log_function
-from server_utils.db_utils import get_mongodb_connection_string
+from server_utils.db_utils.validation_utils import get_mongodb_connection_string
 
 
 class MongoDBDriver(DBDriverInterface):
@@ -116,19 +116,19 @@ class MongoDBDriver(DBDriverInterface):
     @log_function
     def update_one(self, table_name: str, data_filter: dict, new_data: dict) -> ObjectId:
         try:
-            self.logger.debug(f"Trying to delete one data from table: '{table_name}', db: '{self.DB_NAME}'")
-            res = self.__db[table_name].update_one(data_filter, new_data)
+            self.logger.debug(f"Trying to update one data from table: '{table_name}', db: '{self.DB_NAME}'")
+            res = self.__db[table_name].update_one(data_filter, {"$set": new_data})
             if res:
                 object_id = res.raw_result.get('_id')
                 self.logger.info(
                     f"updated one data from db: '{self.DB_NAME}', table_name: '{table_name}', id: '{object_id}'")
                 return object_id
             else:
-                desc = f"Error delete data with filter: {data_filter}, table: '{table_name}, db: {self.DB_NAME}'"
+                desc = f"Error update data with filter: {data_filter}, table: '{table_name}, db: {self.DB_NAME}'"
                 self.logger.error(desc)
-                raise DeleteDataDBException(desc)
+                raise UpdateDataDBException(desc)
         except Exception as e:
-            self.logger.error(f"Error delete one from db: {str(e)}")
+            self.logger.error(f"Error update one from db: {str(e)}")
             raise e
 
     @log_function

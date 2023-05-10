@@ -1,20 +1,19 @@
 import datetime
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from typing import List, Optional
+
+from db_driver.db_objects.status_timestamp import StatusTimestamp
 
 
 @dataclass
-class Article:
-    article_id: str
+class Task:
+    task_id: str
     url: str
     domain: str
-    title: str
-    content: str
-    collecting_time: datetime.datetime
-    publishing_time: Optional[datetime.datetime] = None
-    cluster_id: Optional[str] = None
-    task_id: Optional[str] = None
-    images: Optional[List[str]] = None
+    status: str
+    type: str
+    status_timestamp: List[StatusTimestamp | dict] = field(default_factory=lambda: [])
+    creation_time: datetime.datetime = None
 
     def __repr__(self) -> str:
         string = ''

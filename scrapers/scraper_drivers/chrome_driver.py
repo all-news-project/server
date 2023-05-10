@@ -7,13 +7,13 @@ from selenium.webdriver import ActionChains, Keys
 from selenium.webdriver.chrome.options import Options
 
 from logger import get_current_logger, log_function
-from scrapers.scraper_component.utils.driver_consts import BrowserConsts, MainConsts
-from scrapers.scraper_component.interfaces.base_driver_interface import BaseDriverInterface
-from scrapers.scraper_component.utils.driver_utils import get_driver_path, get_temp_browser_profile_path, \
+from scrapers.scraper_drivers.utils.driver_consts import BrowserConsts, MainConsts
+from scrapers.scraper_drivers.interfaces.base_driver_interface import BaseDriverInterface
+from scrapers.scraper_drivers.utils.driver_utils import get_driver_path, get_temp_browser_profile_path, \
     create_path_if_needed, kill_browser_childes
 from selenium import webdriver
 
-from scrapers.scraper_component.utils.element import Element
+from scrapers.scraper_drivers.utils.element import Element
 
 
 class ChromeDriver(BaseDriverInterface):

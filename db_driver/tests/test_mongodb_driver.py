@@ -19,7 +19,7 @@ class TestMongoDBDriver(TestCase):
             publishing_time = datetime.now()
             collecting_time = datetime.now()
             test_article = Article(
-                article_id=article_id, url=url, website=website, title=title, content=content,
+                article_id=article_id, url=url, domain=website, title=title, content=content,
                 publishing_time=publishing_time, collecting_time=collecting_time
             )
             return db_utils.insert_one(table_name='articles', data=test_article.convert_to_dict())
@@ -38,15 +38,15 @@ class TestMongoDBDriver(TestCase):
             publishing_time = datetime.now()
             collecting_time = datetime.now()
             test_articles = [Article(
-                article_id=article_id, url=url, website=website, title=title, content=content,
+                article_id=article_id, url=url, domain=website, title=title, content=content,
                 publishing_time=publishing_time, collecting_time=collecting_time
             ),
                 Article(
-                    article_id=article_id, url=url, website=website, title=title, content=content,
+                    article_id=article_id, url=url, domain=website, title=title, content=content,
                     publishing_time=publishing_time, collecting_time=collecting_time
                 ),
                 Article(
-                    article_id=article_id, url=url, website=website, title=title, content=content,
+                    article_id=article_id, url=url, domain=website, title=title, content=content,
                     publishing_time=publishing_time, collecting_time=collecting_time
                 )
             ]
