@@ -38,9 +38,7 @@ class TIMEScraper(WebsiteScraperBase):
         self.logger.debug(f"Trying to click close popups if needed")
         self._try_click_element(by=By.XPATH, value=TIMEXPaths.popup_close_button, raise_on_fail=False)
 
-    def get_new_article_urls_from_home_page(self) -> List[str]:
-        self._get_page(self._homepage_url)
-        self._close_popups_if_needed()
+    def _extract_article_urls_from_home_page(self) -> List[str]:
         articles_urls = set()
         articles_elements = self._driver.find_elements(by=By.XPATH, value=TIMEXPaths.articles_elements)
         for element in articles_elements:

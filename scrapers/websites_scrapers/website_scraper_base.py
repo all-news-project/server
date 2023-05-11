@@ -21,6 +21,7 @@ class WebsiteScraperBase:
     def __init__(self):
         self._driver = get_scraping_driver(via_request=self.USE_REQUEST_DRIVER, headless=self.HEADLESS)
         self.logger = get_current_logger()
+        self._homepage_url = None
 
     @log_function
     def _get_page(self, url: str):
@@ -80,6 +81,15 @@ class WebsiteScraperBase:
         }
         return Article(**data)
 
+    def get_new_article_urls_from_home_page(self) -> List[str]:
+        self._get_page(self._homepage_url)
+        self._close_popups_if_needed()
+        article_urls = self._extract_article_urls_from_home_page()
+        return article_urls
+
+    def _extract_article_urls_from_home_page(self) -> List[str]:
+        raise NotImplementedError
+
     def _get_article_title(self) -> str:
         raise NotImplementedError
 
@@ -96,7 +106,4 @@ class WebsiteScraperBase:
         raise NotImplementedError
 
     def _close_popups_if_needed(self):
-        raise NotImplementedError
-
-    def get_new_article_urls_from_home_page(self) -> List[str]:
         raise NotImplementedError

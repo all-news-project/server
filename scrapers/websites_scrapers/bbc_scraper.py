@@ -65,8 +65,7 @@ class BBCScraper(WebsiteScraperBase):
         self._try_click_element(by=By.XPATH, value=BBCXPaths.popup_close_button, raise_on_fail=False)
 
     @log_function
-    def get_new_article_urls_from_home_page(self) -> List[str]:
-        self._get_page(self._homepage_url)
+    def _extract_article_urls_from_home_page(self) -> List[str]:
         articles_urls = set()
         articles_elements = self._driver.find_elements(by=By.XPATH, value=BBCXPaths.articles_elements)
         for element in articles_elements:
