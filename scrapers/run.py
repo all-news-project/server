@@ -1,5 +1,5 @@
-from scrapers.scraper_drivers import get_scraping_driver
+from scrapers.logic_scraper import LogicScaper
 
 if __name__ == '__main__':
-    driver = get_scraping_driver(via_request=False)
-    print(driver.get_current_url())
+    logic_scraper = LogicScaper()
+    logic_scraper.run()

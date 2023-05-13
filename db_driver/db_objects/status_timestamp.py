@@ -3,7 +3,7 @@ from dataclasses import dataclass, asdict
 
 
 @dataclass
-class Timestamp:
+class StatusTimestamp:
     status: str
     time_changed: datetime.datetime
 

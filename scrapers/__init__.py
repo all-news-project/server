@@ -1,9 +1,10 @@
 from logger import get_current_logger
 from scrapers.websites_scrapers.bbc_scraper import BBCScraper
+from scrapers.websites_scrapers.time_scraper import TIMEScraper
 from scrapers.websites_scrapers.utils.exceptions import UnknownWebsiteScraperException
 from scrapers.websites_scrapers.website_scraper_base import WebsiteScraperBase
 
-SCRAPERS = {"bbc": BBCScraper}  # example: "bbc": BBCWebsiteScraper
+SCRAPERS = {"bbc": BBCScraper, "time": TIMEScraper}
 
 
 def websites_scrapers_factory(scraper_name: str, *args, **kwargs) -> WebsiteScraperBase:
