@@ -21,6 +21,7 @@ class MongoDBDriver(DBDriverInterface):
         self.__db = self.__client[self.DB_NAME]
         self.logger.debug(f"Connected to mongodb")
 
+
     @log_function
     def close(self):
         self.__client.close()
@@ -83,7 +84,7 @@ class MongoDBDriver(DBDriverInterface):
         try:
             self.logger.debug(f"Trying to delete one data from table: '{table_name}', db: '{self.DB_NAME}'")
             res = self.__db[table_name].delete_one(data_filter)
-            if res:
+            if res and res.deleted_count>0:
                 object_id = res.raw_result.get('_id')
                 self.logger.info(
                     f"Deleted data from db: '{self.DB_NAME}', table_name: '{table_name}', id: '{object_id}'")
@@ -101,7 +102,7 @@ class MongoDBDriver(DBDriverInterface):
         try:
             self.logger.debug(f"Trying to delete collection of data from table: '{table_name}', db: '{self.DB_NAME}'")
             res = self.__db[table_name].delete_many(data_filter)
-            if res:
+            if res.deleted_count and res.deleted_count>0:
                 self.logger.info(
                     f"Deleted {res.deleted_count} records from db: '{self.DB_NAME}', " f"table_name: '{table_name}'")
                 return True
@@ -180,7 +181,7 @@ class MongoDBDriver(DBDriverInterface):
                 return True
             else:
                 desc = f"Didn't find record with filter: {data_filter}, table: '{table_name}, db: {self.DB_NAME}'"
-                self.logger.warning(desc)
+                self.logger.error(desc)
                 return False
         except Exception as e:
             self.logger.error(f"Error counting from db: {str(e)}")
@@ -191,13 +192,13 @@ class MongoDBDriver(DBDriverInterface):
         try:
             self.logger.debug(f"Trying to get one data from table: '{table_name}', db: '{self.DB_NAME}'")
             res = self.__db[table_name].find(data_filter)
-            if res:
+            if res and res.retrieved>0:
                 object_id = res.cursor_id
                 self.logger.info(f"Got data from db: '{self.DB_NAME}', table_name: '{table_name}', id: '{object_id}'")
                 return list(dict(res))
             else:
                 desc = f"Error find data with filter: {data_filter}, table: '{table_name}', db: '{self.DB_NAME}'"
-                self.logger.warning(desc)
+                self.logger.error(desc)
                 raise DataNotFoundDBException(desc)
         except Exception as e:
             self.logger.error(f"Error get many from db - {str(e)}")
