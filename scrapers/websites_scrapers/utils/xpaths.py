@@ -9,3 +9,8 @@ class BBCXPaths:
 class TIMEXPaths:
     articles_elements = "//*[@class='topic-section-wrapper']//ul[contains(@class, 'items')]//li[contains(@id,'item')]//a[@href]"
     popup_close_button = "//*[@id='close_icon']"
+
+
+class NBCXPaths:
+    articles_elements = "//a[contains(@href, '/us-news/') or contains(@href, '/politics/') or contains(@href, '/world/')]"
+    text_block = "//div[@class='article-body']/.//p"

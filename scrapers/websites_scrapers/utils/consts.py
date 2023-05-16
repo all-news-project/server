@@ -4,6 +4,7 @@ import os
 class ScraperConsts:
     BBC_HOME_PAGE = "https://www.bbc.com/news/"
     TIME_HOME_PAGE = "https://time.com/"
+    NBC_HOME_PAGE = "https://www.nbcnews.com/"
 
 
 class BBCConsts:
@@ -13,6 +14,10 @@ class BBCConsts:
 
 
 class TIMEConsts:
+    NEW_ARTICLE_URL_FILTER = []
+
+
+class NBCConsts:
     NEW_ARTICLE_URL_FILTER = []
 
 
