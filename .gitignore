@@ -2,4 +2,5 @@
 db_driver/cred
 venv/
 *_pids.txt
+nlp_models/temp
 scrapers/chromedriver.exe
