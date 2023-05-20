@@ -54,7 +54,7 @@ class Nlp_Utils:
             embeddings = model.encode(sentences)
             d = np.dot(embeddings[0], embeddings[1], out=None)
             self.logger.debug("Similarity rate successful")
-            return d
+            return d*100
         except Exception as e:
             self.logger.error("Failed to compare text")
             print(e)
