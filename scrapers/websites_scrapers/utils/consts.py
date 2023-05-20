@@ -18,6 +18,7 @@ class TIMEConsts:
 
 
 class NBCConsts:
+    PUBLISHING_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
     NEW_ARTICLE_URL_FILTER = []
 
 
