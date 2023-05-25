@@ -96,7 +96,7 @@ class WebsiteScraperBase:
     def _get_article_content_text(self) -> str:
         raise NotImplementedError
 
-    def _get_article_publishing_time(self) -> Union[datetime, object]:
+    def _get_article_publishing_time(self) -> Union[datetime, None]:
         raise NotImplementedError
 
     def _get_article_image_urls(self) -> List[str]:

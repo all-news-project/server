@@ -1,5 +1,5 @@
 from time import sleep
-from typing import List
+from typing import List, Tuple
 
 from pymongo.errors import ConnectionFailure
 
@@ -41,7 +41,7 @@ class LogicScaper:
                 self.logger.error(desc)
 
     @log_function
-    def _handle_task(self, task: Task) -> str:
+    def _handle_task(self, task: Task) -> Tuple[str, str]:
         try:
             website_scraper = websites_scrapers_factory(scraper_name=task.domain)
             if task.type == MainConsts.COLLECT_URLS:
@@ -57,14 +57,14 @@ class LogicScaper:
         except UnwantedArticleException:
             desc = f"Article is Unwanted: `{task.task_id}` change task status to: `{TaskConsts.UNWANTED}`"
             self.logger.warning(desc)
-            return TaskConsts.UNWANTED
+            return TaskConsts.UNWANTED, TaskConsts.DESC_UNWANTED
 
         except Exception as e:
             desc = f"Failed run task task_id: `{task.task_id}`, type: `{task.type}` - {str(e)}"
             self.logger.error(desc)
-            return TaskConsts.FAILED
+            return TaskConsts.FAILED, desc
 
-        return TaskConsts.SUCCEEDED
+        return TaskConsts.SUCCEEDED, TaskConsts.DESC_SUCCEEDED
 
     @log_function
     def run(self):
@@ -74,8 +74,8 @@ class LogicScaper:
                 if task:
                     self.logger = get_current_logger(task_id=task.task_id, task_type=task.type)
                     self.task_utils.update_task_status(task=task, status=TaskConsts.RUNNING)
-                    task_status = self._handle_task(task=task)
-                    self.task_utils.update_task_status(task=task, status=task_status)
+                    task_status, desc = self._handle_task(task=task)
+                    self.task_utils.update_task_status(task=task, status=task_status, desc=desc)
                 else:
                     self.logger.warning(f"Couldn't find task, sleeping for {ScheduleConsts.SLEEPING_TIME / 60} minutes")
                     sleep(ScheduleConsts.SLEEPING_TIME)

@@ -41,10 +41,10 @@ class TaskUtils:
         raise InsertDataDBException(desc)
 
     @log_function
-    def update_task_status(self, task: Task, status: str):
+    def update_task_status(self, task: Task, status: str, desc: str = None):
         try:
             data_filter = {"task_id": task.task_id}
-            new_timestamp = StatusTimestamp(status=status, time_changed=datetime.now())
+            new_timestamp = StatusTimestamp(status=status, time_changed=datetime.now(), desc=desc)
             task.status_timestamp.append(new_timestamp.convert_to_dict())
             new_data = {"status": status, "status_timestamp": task.status_timestamp}
             self._db.update_one(table_name=DBConsts.TASKS_TABLE_NAME, data_filter=data_filter, new_data=new_data)
@@ -56,6 +56,7 @@ class TaskUtils:
     @log_function
     def _get_task_by_status(self, status: str):
         try:
+            self.logger.debug(f"Trying get task by status: `{status}`")
             task: dict = self._db.get_one(table_name=DBConsts.TASKS_TABLE_NAME, data_filter={"status": status})
             task_object: Task = get_db_object_from_dict(task, Task)
             return task_object

@@ -2,9 +2,11 @@ import re
 from datetime import datetime
 from typing import List, Union
 
+from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from logger import log_function
+from scrapers.websites_scrapers.utils.exceptions import UnwantedArticleException
 from scrapers.websites_scrapers.utils.xpaths import TIMEXPaths
 from scrapers.websites_scrapers.website_scraper_base import WebsiteScraperBase
 from scrapers.websites_scrapers.utils.consts import ScraperConsts, TIMEConsts
@@ -16,19 +18,39 @@ class TIMEScraper(WebsiteScraperBase):
         self._homepage_url = ScraperConsts.TIME_HOME_PAGE
 
     def _get_article_title(self) -> str:
-        pass
+        return self._driver.get_title().replace(TIMEConsts.TITLE_FILTER, "")
 
     def _get_article_content_text(self) -> str:
-        pass
+        paragraphs = self._driver.find_elements(by=By.XPATH, value=TIMEXPaths.text_article)
+        if not paragraphs:
+            desc = f"Error find content text of article, element value: `{TIMEXPaths.text_article}`"
+            self.logger.error(desc)
+            raise NoSuchElementException(desc)
+        else:
+            paragraphs[0].text = paragraphs[0].real_element.text.replace('\n', '')
+            return " ".join([paragraph.get_text() for paragraph in paragraphs])
 
-    def _get_article_publishing_time(self) -> Union[datetime, object]:
-        pass
+    def _get_article_publishing_time(self) -> Union[datetime, None]:
+        try:
+            time_element = self._driver.find_element(by=By.XPATH, value=TIMEXPaths.publishing_time_element)
+            publishing_timestamp = time_element.get_attribute("content")
+            publishing_datetime = datetime.strptime(publishing_timestamp, TIMEConsts.PUBLISHING_FORMAT)
+            return publishing_datetime
+        except Exception as e:
+            self.logger.warning(f"Error collecting publishing time - {e}")
+            return None
 
     def _get_article_image_urls(self) -> List[str]:
-        pass
+        image_urls = []
+        images = self._driver.find_elements(by=By.XPATH, value=TIMEXPaths.article_image)
+        for image in images:
+            image_urls.append(image.get_attribute("src"))
+        return image_urls
 
     def _check_unwanted_article(self):
-        pass
+        self.logger.debug(f"_check_unwanted_article, current -> `{self._driver.get_current_url()}`")
+        if "/charter/" in self._driver.get_current_url():
+            raise UnwantedArticleException(f"Article is unwanted -> `{self._driver.get_current_url()}`")
 
     @log_function
     def _close_popups_if_needed(self):
