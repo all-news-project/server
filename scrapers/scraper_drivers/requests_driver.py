@@ -76,7 +76,7 @@ class RequestsDriver(BaseDriverInterface):
             self.__raise_no_such_element_exception(by=by, value=value, exception=e)
         if element is None:
             self.__raise_no_such_element_exception(by=by, value=value, exception=NoSuchElementException)
-        return Element(read_element=element)
+        return Element(read_element=element, text=element.text)
 
     def __raise_no_such_element_exception(self, by, value, exception):
         desc = f"Cannot find element by: `{by}` with value: `{value}` - {str(exception)}"
@@ -102,4 +102,4 @@ class RequestsDriver(BaseDriverInterface):
             self.__raise_no_such_element_exception(by=by, value=value, exception=e)
         if elements is None:
             return list()
-        return [Element(read_element=element) for element in elements]
+        return [Element(read_element=element, text=element.text) for element in elements]
