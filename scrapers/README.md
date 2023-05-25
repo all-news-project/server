@@ -33,3 +33,13 @@ scrape-new-articles-urls --> scrape-articles-content;
 6. collect article content
 7. save to db
 8. update task as `succeeded` or `failed`
+
+### Deploy
+
+```shell
+docker build -t scraper_<version> .
+```
+
+```shell
+docker run --rm scraper_<version>
+```
