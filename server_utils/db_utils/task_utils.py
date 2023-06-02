@@ -56,6 +56,7 @@ class TaskUtils:
     @log_function
     def _get_task_by_status(self, status: str):
         try:
+            self.logger.debug(f"Trying get task by status: `{status}`")
             task: dict = self._db.get_one(table_name=DBConsts.TASKS_TABLE_NAME, data_filter={"status": status})
             task_object: Task = get_db_object_from_dict(task, Task)
             return task_object
