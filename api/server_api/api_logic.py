@@ -1,41 +1,60 @@
 from typing import List
 
+from api.server_api.exceptions import ArticleNotFoundException, NoSimilarArticlesException, GetSimilarArticlesException
 from api.server_api.objects.article_api_data import ArticleApiData
 from db_driver import get_current_db_driver
 from db_driver.db_objects.article import Article
 from db_driver.db_objects.cluster import Cluster
-# from server_logger import get_current_logger, log_function
+from logger import get_current_logger
 from server_utils.db_utils.article_utils import ArticleUtils
 from server_utils.db_utils.cluster_utils import ClusterUtils
 
 
 class APILogic:
     def __init__(self):
-        # self.server_logger = get_current_logger(task_type="api logic")
+        self.server_logger = get_current_logger(task_type="api logic")
         self._db = get_current_db_driver()
         self._article_utils = ArticleUtils()
         self._cluster_utils = ClusterUtils()
 
     def get_similar_articles_data(self, article_url: str) -> List[ArticleApiData]:
-        # self.server_logger.debug(f"Checking similar articles to article -> `{article_url}`")
-
+        """
+        This function get URL of an article and return similar articles that already classified to cluster
+        :param article_url:
+        :return:
+        """
+        self.server_logger.debug(f"Checking similar articles to article -> `{article_url}`")
         similar_articles: List[ArticleApiData] = list()
         article_object: Article = self._article_utils.get_article(article_url=article_url)
 
-        # if cluster exists, getting other articles data
-        if article_object.cluster_id:
-            # self.server_logger.info(f"Found cluster: `{article_object.cluster_id}`")
+        if not article_object:
+            desc = f"Didn't find article in db with article url: `{article_url}`"
+            self.server_logger.warning(desc)
+            raise ArticleNotFoundException(desc)
 
-            # getting cluster
+        if not article_object.cluster_id:
+            desc = f"Didn't find similar classified articles in db with article url: `{article_url}`"
+            self.server_logger.warning(desc)
+            raise NoSimilarArticlesException(desc)
+
+        # if cluster exists, getting other articles data
+        self.server_logger.info(f"Found cluster: `{article_object.cluster_id}`")
+
+        # getting cluster
+        try:
             cluster_object: Cluster = self._cluster_utils.get_cluster(article_object.cluster_id)
             articles = self._article_utils.get_articles(articles_id=cluster_object.articles_id)
 
             # collect needed articles data
-            # self.server_logger.info(f"Got {len(articles)} similar articles")
+            self.server_logger.info(f"Got {len(articles)} similar articles")
             for index, article in enumerate(articles):
-                # self.server_logger.debug(f"({index + 1}) article data: `{article.convert_to_dict()}`")
+                self.server_logger.debug(f"({index + 1}) article data: `{article.convert_to_dict()}`")
                 article_api_object = self.__get_convert_article_api_data(article=article)
                 similar_articles.append(article_api_object)
+        except Exception as e:
+            desc = f"Error getting similar articles data - `{str(e)}`"
+            self.server_logger.error(desc)
+            raise GetSimilarArticlesException(desc)
         return similar_articles
 
     @staticmethod

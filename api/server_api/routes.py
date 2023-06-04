@@ -2,6 +2,7 @@ from flask import request
 
 from api.server_api import app
 from api.server_api.api_logic import APILogic
+from api.server_api.exceptions import ArticleNotFoundException, NoSimilarArticlesException, GetSimilarArticlesException
 
 
 @app.route('/')
@@ -12,13 +13,20 @@ def index():
 
 @app.route('/get_similar_articles', methods=['POST'])
 def get_similar_articles():
-    if 'url' in request.args:
-        article_url: str = request.args['url']
+    return_data = {"articles_data": list(), "error_msg": "", "succeeded": False}
+    if 'url' not in request.args:
+        return_data["error_msg"] = "url required"
+        return return_data
+    try:
         api_logic = APILogic()
+        article_url: str = request.args['url']
         similar_articles_data = api_logic.get_similar_articles_data(article_url=article_url)
-        if similar_articles_data:
-            return similar_articles_data
-        else:
-            return "No articles found"
-    else:
-        return "Need to get current url"
+        return_data["articles_data"] = similar_articles_data
+        return_data["succeeded"] = True
+    except ArticleNotFoundException:
+        return_data["error_msg"] = "article not found in db"
+    except NoSimilarArticlesException:
+        return_data["error_msg"] = "no similar articles found"
+    except GetSimilarArticlesException:
+        return_data["error_msg"] = "error getting similar articles"
+    return return_data
