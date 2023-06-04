@@ -6,6 +6,8 @@ class ScheduleConsts:
 
 
 class TaskConsts:
+    DESC_UNWANTED = "Task is unwanted"
+    DESC_SUCCEEDED = "Task succeeded"
     TIMES_TRY_CREATE_TASK = int(os.getenv(key="TIMES_TRY_CREATE_TASK", default=3))
     PENDING = "pending"
     RUNNING = "running"

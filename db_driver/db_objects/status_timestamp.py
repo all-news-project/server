@@ -1,11 +1,13 @@
 import datetime
 from dataclasses import dataclass, asdict
+from typing import Optional
 
 
 @dataclass
 class StatusTimestamp:
     status: str
     time_changed: datetime.datetime
+    desc: Optional[str] = None
 
     def __repr__(self) -> str:
         string = ''

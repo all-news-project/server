@@ -7,6 +7,9 @@ class BBCXPaths:
 
 
 class TIMEXPaths:
+    article_image = "//div[@class='article-content']//img[contains(@src,'api.time.com/wp-content')]"
+    publishing_time_element = "//meta[@property='article:published_time']"
+    text_article = "//div[@id='article-body']/div/p[not(@class)] | //div[@id='article-body']/div/ul/li"
     articles_elements = "//*[@class='topic-section-wrapper']//ul[contains(@class, 'items')]//li[contains(@id,'item')]//a[@href]"
     popup_close_button = "//*[@id='close_icon']"
 

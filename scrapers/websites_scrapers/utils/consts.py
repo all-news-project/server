@@ -14,6 +14,8 @@ class BBCConsts:
 
 
 class TIMEConsts:
+    TITLE_FILTER = " | Time"
+    PUBLISHING_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
     NEW_ARTICLE_URL_FILTER = []
 
 

@@ -4,3 +4,4 @@ venv/
 *_pids.txt
 nlp_models/temp
 scrapers/chromedriver.exe
+__pycache__

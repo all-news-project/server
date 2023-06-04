@@ -32,7 +32,7 @@ class BBCScraper(WebsiteScraperBase):
             return " ".join([paragraph.get_text() for paragraph in paragraphs])
 
     @log_function
-    def _get_article_publishing_time(self) -> Union[datetime, object]:
+    def _get_article_publishing_time(self) -> Union[datetime, None]:
         try:
             time_element = self._driver.find_element(by=By.XPATH, value=BBCXPaths.publishing_time_element)
             publishing_timestamp = time_element.get_attribute("datetime")
