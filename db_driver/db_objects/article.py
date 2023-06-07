@@ -17,9 +17,7 @@ class Article:
     images: Optional[List[str]] = None
 
     def __repr__(self) -> str:
-        string = ''
-        for prop, value in vars(self).items():
-            string += f"{str(prop)}: {str(value)}\n"
+        string = f'(domain: `{self.domain}`, url: `{self.url}`, title: `{self.title}`)'
         return string
 
     def convert_to_dict(self) -> dict:

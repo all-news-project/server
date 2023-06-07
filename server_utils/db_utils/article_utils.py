@@ -66,6 +66,7 @@ class ArticleUtils:
             article = article_object
         except DataNotFoundDBException as e:
             self.logger.warning(f"Error get article by article url: `{article_url}` - {str(e)}")
+        self.logger.info(f"Got article from db, article_id: `{article.article_id}`, url: `{article.url}`")
         return article
 
     def get_articles(self, articles_id: List[str]) -> List[Article]:

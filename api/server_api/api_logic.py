@@ -48,7 +48,7 @@ class APILogic:
             # collect needed articles data
             self.server_logger.info(f"Got {len(articles)} similar articles")
             for index, article in enumerate(articles):
-                self.server_logger.debug(f"({index + 1}) article data: `{article.convert_to_dict()}`")
+                self.server_logger.debug(f"({index + 1}) Article data: `{str(article)}`")
                 article_api_object = self.__get_convert_article_api_data(article=article)
                 similar_articles.append(article_api_object)
         except Exception as e:

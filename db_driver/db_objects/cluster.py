@@ -10,8 +10,8 @@ class Cluster:
     main_article_id: str
     creation_time: datetime
     last_updated: datetime
-    websites: list[str]
-    category: Optional[str] = None
+    domains: list[str]
+    categories: Optional[str] = None
 
     def convert_to_dict(self) -> dict:
         return asdict(self)
