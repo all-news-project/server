@@ -43,7 +43,12 @@ class ServerLogger(Singleton):
     def __init__(self, task_id: str = None, task_type: str = None):
         root_logger = logging.getLogger()
         console_handler = logging.StreamHandler(stream=sys.stdout)
-        console_format = MainConsts.CONSOLE_FORMAT
+
+        if task_id and task_type:
+            console_format = MainConsts.SERVER_LOGGER_FORMAT
+        else:
+            console_format = MainConsts.LOGGER_FORMAT
+
         colored_formatter = ColorFormatter(console_format)
         console_handler.setFormatter(colored_formatter)
 
@@ -51,11 +56,11 @@ class ServerLogger(Singleton):
         self.logger.setLevel(level=logging.DEBUG)
 
         self.__task_id = task_id
-        if self.__task_id or not hasattr(self.logger, "task_id"):
+        if self.__task_id: # or not hasattr(self.logger, "task_id"):
             self.logger.__setattr__("task_id", self.__task_id)
 
         self.__task_type = task_type
-        if self.__task_type or not hasattr(self.logger, "task_type"):
+        if self.__task_type: # or not hasattr(self.logger, "task_type"):
             self.logger.__setattr__("task_type", self.__task_type)
 
         if not self.__initialized:
@@ -108,10 +113,10 @@ class ServerLogger(Singleton):
 
     def _prepare_msg_extra(self):
         extra = dict()
-        if hasattr(self.logger, "task_id"):
+        if hasattr(self.logger, "task_id") and self.__task_id:
             extra["task_id"] = self.logger.task_id
 
-        if hasattr(self.logger, "task_type"):
+        if hasattr(self.logger, "task_type") and self.__task_type:
             extra["task_type"] = self.logger.task_type
 
         return extra

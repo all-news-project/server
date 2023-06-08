@@ -56,6 +56,9 @@ class ChromeDriver(BaseDriverInterface):
         # Implicitly wait time
         self._driver.implicitly_wait(MainConsts.IMPLICITLY_WAIT_TIME)
 
+        # Page load timeout
+        self._driver.set_page_load_timeout(MainConsts.DEFAULT_PAGE_LOAD_TIMEOUT)
+
         # Maximize the page window
         self._driver.maximize_window()
 
@@ -118,7 +121,7 @@ class ChromeDriver(BaseDriverInterface):
             except InvalidArgumentException:
                 desc = f"Error getting url: '{url}' - invalid url input format, please give full correct format"
                 self.__error_and_exit(desc)
-            except WebDriverException as e:
+            except (WebDriverException, TimeoutException) as e:
                 if "ERR_CONNECTION_RESET" in str(e):
                     continue
                 desc = f"Error getting to page url: `{url}` - {str(e)}"
@@ -171,16 +174,19 @@ class ChromeDriver(BaseDriverInterface):
     def wait_until_object_appears(self, by, value, timeout: int = MainConsts.DEFAULT_ELEMENT_TIMEOUT):
         start_time = datetime.now()
         seconds_pass = 0
+        seconds_counter = 0
         while seconds_pass < timeout:
             seconds_pass = (datetime.now() - start_time).total_seconds()
             try:
-                self.logger.debug(f"Waiting for element {value} to appears TIMEOUT: ({seconds_pass}/{timeout})")
+                if seconds_pass > seconds_counter + 1:
+                    self.logger.debug(f"Waiting for element `{value}` to appears timeout: {seconds_pass:.3f}/{timeout}")
                 elements = self._driver.find_elements(by=by, value=value)
                 if not elements:
                     raise NoSuchElementException
                 self.logger.info(f"Element {value} found")
                 return
             except NoSuchElementException:
+                seconds_counter = int(seconds_pass)
                 sleep(MainConsts.ELEMENT_SLEEPING_TIME)
                 continue
         raise TimeoutException
