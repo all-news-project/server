@@ -17,11 +17,9 @@ class Element(ElementInterface):
         self.__set_element_type()
         self.text = text
 
-    @log_function
     def set_text(self, text: str):
         self.text = text
 
-    @log_function
     def __set_element_type(self):
         if isinstance(self.real_element, Tag):
             self.element_type = ElementsConsts.REQ_ELEMENT

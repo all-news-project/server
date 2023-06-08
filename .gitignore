@@ -5,3 +5,7 @@ venv/
 nlp_models/temp
 scrapers/chromedriver.exe
 __pycache__
+*/integration/api/
+*/integration/scapres/
+*/integration/scheduler/
+*/integration/nlp_models/

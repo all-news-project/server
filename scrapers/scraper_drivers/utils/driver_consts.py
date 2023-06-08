@@ -2,6 +2,7 @@ import os
 
 
 class MainConsts:
+    DEFAULT_PAGE_LOAD_TIMEOUT = int(os.getenv("PAGE_LOAD_TIMEOUT", 60 * 2))
     DEFAULT_ELEMENT_TIMEOUT = int(os.getenv(key="DEFAULT_ELEMENT_TIMEOUT", default=5))
     IMPLICITLY_WAIT_TIME = int(os.getenv(key="IMPLICITLY_WAIT_TIME", default=0))
     ELEMENT_SLEEPING_TIME = float(os.getenv(key="ELEMENT_SLEEPING_TIME", default=0.25))
