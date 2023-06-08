@@ -48,6 +48,6 @@ class ClusterUtils:
 # For debug
 if __name__ == '__main__':
     article_utils = ArticleUtils()
-    new_article: Article = article_utils.get_article(article_url="https://www.bbc.com/news/world-europe-65471904")
+    new_article: Article = article_utils.get_article_by_url(article_url="https://www.bbc.com/news/world-europe-65471904")
     cluster_utils = ClusterUtils()
     cluster_utils.create_new_cluster(article=new_article, classified_categories=["finance", "bitcoin"])

@@ -25,7 +25,7 @@ class APILogic:
         """
         self.server_logger.debug(f"Checking similar articles to article -> `{article_url}`")
         similar_articles: List[ArticleApiData] = list()
-        article_object: Article = self._article_utils.get_article(article_url=article_url)
+        article_object: Article = self._article_utils.get_article_by_url(article_url=article_url)
 
         if not article_object:
             desc = f"Didn't find article in db with article url: `{article_url}`"
