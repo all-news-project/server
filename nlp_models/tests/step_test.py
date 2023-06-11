@@ -5,6 +5,8 @@ from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+from logger import log_function
+
 
 def preprocess_text(text):
     # Tokenize the text
@@ -23,11 +25,11 @@ def preprocess_text(text):
 
     return preprocessed_text
 
-
+@log_function
 def compare_similarity(text1, text2):
-    nltk.download('stopwords')
-    nltk.download('punkt')
-    nltk.download('wordnet')
+    #nltk.download('stopwords')
+    #nltk.download('punkt')
+    #nltk.download('wordnet')
     # Preprocess the texts
     preprocessed_text1 = preprocess_text(text1)
     preprocessed_text2 = preprocess_text(text2)
@@ -52,7 +54,7 @@ print(f"Similarity score: {similarity_score}")
 
 import tensorflow as tf
 import tensorflow_hub as hub
-
+@log_function
 def compare_texts_tf(text1, text2):
     # Load the Universal Sentence Encoder module
     module_url = "https://tfhub.dev/google/universal-sentence-encoder-large/5"
