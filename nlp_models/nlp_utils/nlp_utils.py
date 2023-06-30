@@ -152,7 +152,7 @@ class Nlp_Utils:
         else:
             label_list = np.zeros(shape=len(x_data))
         return x_data, list(label_list)
-    def get_sim(self,text1,text2):
+    def _get_sim(self,text1,text2):
         nltk_sim=self._nltk_similarity(text1, text2)
         trans_sim=self._transformers_similarity([text1,text2])
         return [nltk_sim,trans_sim]
@@ -264,4 +264,4 @@ class Nlp_Utils:
                 self.similar_inputs - self.non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
             self.model.fit(sim_rates, 0)
             self.model.save("nlp_model.h5")
-        return res > 0.65
+        return res #> 0.65
