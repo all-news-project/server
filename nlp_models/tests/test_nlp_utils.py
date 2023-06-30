@@ -1,9 +1,6 @@
 import unittest
 import itertools
 
-import keras
-import numpy as np
-
 from db_driver import get_current_db_driver
 from db_driver.db_objects.article import Article
 from db_driver.db_objects.db_objects_utils import get_db_object_from_dict
@@ -11,7 +8,6 @@ from db_driver.utils.consts import DBConsts
 from logger import log_function, get_current_logger
 from nlp_models.nlp_utils.nlp_utils import Nlp_Utils
 from server_utils.db_utils.article_utils import ArticleUtils
-import pandas as pd
 
 
 class MyTestCase(unittest.TestCase):
@@ -54,8 +50,9 @@ class MyTestCase(unittest.TestCase):
 
     def test_get_permutations(self):
         lst = {"a": [1, 2, 3], "b": [11, 22, 33], "c": [111, 222]}
-        assert MyTestCase.get_permutations(lst) == {'a': [(1, 2), (1, 3), (2, 3)], 'b': [(11, 22), (11, 33), (22, 33)],
-                                                    'c': [(111, 222)]}
+        self.assertEquals(MyTestCase.get_permutations(lst),
+                          {'a': [(1, 2), (1, 3), (2, 3)], 'b': [(11, 22), (11, 33), (22, 33)],
+                           'c': [(111, 222)]})
 
     # pass
     def test_get_cartesian_product(self):
@@ -96,9 +93,8 @@ class MyTestCase(unittest.TestCase):
         article_texts = [artutils.get_article_by_id(ids).content for ids in art_ids]
         texts = Nlp_Utils._get_permutations([article_texts])
         for data in texts:
-            res = nlp_utils.compare_texts(data[0], data[1]) > 0
-            print(res)
-            assert res > 0
+            res = nlp_utils.compare_texts(data[0], data[1])
+            self.assertTrue(res > 0)
 
     def test_prison_not_similar(self):
         artutils = ArticleUtils()
@@ -110,7 +106,7 @@ class MyTestCase(unittest.TestCase):
                 article_texts.append(artutils.get_article_by_id(_id).content)
         res = nlp_utils.compare_texts(article_texts[0], article_texts[1]) > 0
         print(res)
-        assert not res
+        self.assertFalse(res)
 
     def test_get_model(self):
         nlp = Nlp_Utils()
@@ -119,39 +115,6 @@ class MyTestCase(unittest.TestCase):
     def test_similarity(self):
         nlp = Nlp_Utils()
         nlp.check_similarity()
-
-    def test_similar(self):
-        logger = get_current_logger()
-        artutils = ArticleUtils()
-        req_dict = {}
-        for subject in self.similar_articles_ids:
-            subject_list = []
-            for article_id in subject:
-                subject_list.append(
-                    artutils.get_article_by_id(article_id))
-            subject_title = subject_list[0].title
-            req_dict[subject_title] = subject_list
-        sim_dict = MyTestCase.get_permutations(req_dict)
-        df = MyTestCase.get_similarity_df(sim_dict)
-        df.to_csv("comparison_results.csv")
-        print(df)
-
-    def test_not_similar(self):
-        artutils = ArticleUtils()
-        logger = get_current_logger()
-        nlp = Nlp_Utils()
-        req_dict = {}
-        for subject in self.similar_articles_ids:
-            subject_list = []
-            for article_id in subject:
-                subject_list.append(
-                    artutils.get_article_by_id(article_id))
-            subject_title = subject_list[0].title
-            req_dict[subject_title] = subject_list
-        non_sim_dict = MyTestCase.get_cartesian_product(req_dict)
-        df = MyTestCase.get_similarity_df(non_sim_dict)
-        df.to_csv("non_comparison_results.csv")
-        print(df)
 
     def test_product(self):
         a = [[1, 2, 3, 4],
@@ -162,7 +125,6 @@ class MyTestCase(unittest.TestCase):
         d = []
         for k in n:
             d.append(list(itertools.combinations(k, 2)))
-        k = 5
 
     @log_function
     def test_syria(self):
@@ -177,19 +139,15 @@ class MyTestCase(unittest.TestCase):
         articles = [get_db_object_from_dict(article, Article) for article in articles_dict]
         bbc = articles[0]
         nbc = articles[1]
-        # sim = nlp.similarity(nbc.content, bbc.content) 0.96
-        # sim= nlp._transformers_similarity([nbc.content, bbc.content]) #0.68
-        # sim=_nltk_similarity(nbc.content,bbc.content) # 0.40
         sim = nlp.compare_texts(nbc.content,
-                                bbc.content)  # compare_texts_tf(nbc.content, bbc.content)  # -0.85 , maybe its reversed?
-        assert sim > 50
+                                bbc.content)
+        self.assertTrue(sim > 50)
 
     def test_syria_russia(self):
         _db = get_current_db_driver()
         logger = get_current_logger()
         nlp = Nlp_Utils()
         articles_id = ["f9874b36-eed7-4e5d-80fd-d309899cca45", "0810f002-8645-4e76-a001-d6279df3a73d"]
-
         articles_dict = []
         for articles_id in articles_id:
             articles_dict.append(
@@ -197,36 +155,29 @@ class MyTestCase(unittest.TestCase):
         articles = [get_db_object_from_dict(article, Article) for article in articles_dict]
         bbc = articles[0]
         nbc = articles[1]
-        # TODO: sim = nlp.similarity(nbc.content, bbc.content) similarity isn't the best way to check , need to further
-        # check to improve it
-        # sim = nlp.similarity(nbc.content, bbc.content) 0.94
-        # sim = nlp._transformers_similarity([nbc.content, bbc.content]) #0.38
-        # sim = _nltk_similarity(nbc.content, bbc.content)# 0.099
-        sim = nlp.compare_texts(nbc.content, bbc.content)  # -0.51??
-        assert sim < 50
-        k = 5
-        logger.info("stop")
+        sim = nlp.compare_texts(nbc.content, bbc.content)
+        self.assertTrue(sim > 50)
 
     def test_compare_text(self):
         nlp = Nlp_Utils()
         text1 = "The world is a beautiful place full of amazing sights and experiences."
         text2 = "There are many wonders to be found in nature, from the tallest mountains to the deepest oceans."
-        similarity = nlp._transformers_similarity([text1, text2])
-        assert similarity > 50
+        similarity = nlp.compare_texts(text1, text2)
+        self.assertTrue(similarity > 50)
 
     def test_compare_text_sim(self):
         nlp = Nlp_Utils()
         text1 = "The world is a beautiful place full of amazing sights and experiences."
         text2 = "There are many wonders to be found in nature, from the tallest mountains to the deepest oceans."
-        similarity = nlp.similarity(text1, text2)
-        assert similarity > 50
+        similarity = nlp.compare_texts(text1, text2)
+        self.assertTrue(similarity > 50)
 
     def test_not_similar_sim(self):
         nlp = Nlp_Utils()
         text1 = "The world is a beautiful place full of amazing sights and experiences."
         text2 = "The quick red fox jumps over the lazy cat."
-        similarity = nlp.similarity(text1, text2)
-        assert similarity < 50
+        similarity = nlp.compare_texts(text1, text2)
+        self.assertTrue(similarity < 50)
 
 
 if __name__ == '__main__':
