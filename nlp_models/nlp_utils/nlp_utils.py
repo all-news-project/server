@@ -24,7 +24,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from nlp_models.nlp_utils.consts import NlpConsts
 import numpy as np
 
-from nlp_models.tests.step_test import compare_texts_tf, compare_similarity
 from server_utils.db_utils.article_utils import ArticleUtils
 
 # logger = get_current_logger()
