@@ -19,7 +19,9 @@ class BBCScraper(WebsiteScraperBase):
 
     @log_function
     def _get_article_title(self) -> str:
-        return self._driver.get_title().replace(BBCConsts.TITLE_FILTER, "")
+        title = self._driver.get_title().replace(BBCConsts.TITLE_FILTER, "")
+        self.logger.info(f"Got title: `{title}`")
+        return title
 
     @log_function
     def _get_article_content_text(self) -> str:

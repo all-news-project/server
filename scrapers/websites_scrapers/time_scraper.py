@@ -18,7 +18,9 @@ class TIMEScraper(WebsiteScraperBase):
         self._homepage_url = ScraperConsts.TIME_HOME_PAGE
 
     def _get_article_title(self) -> str:
-        return self._driver.get_title().replace(TIMEConsts.TITLE_FILTER, "")
+        title = self._driver.get_title().replace(TIMEConsts.TITLE_FILTER, "")
+        self.logger.info(f"Got title: `{title}`")
+        return title
 
     def _get_article_content_text(self) -> str:
         paragraphs = self._driver.find_elements(by=By.XPATH, value=TIMEXPaths.text_article)
@@ -26,6 +28,12 @@ class TIMEScraper(WebsiteScraperBase):
             desc = f"Error find content text of article, element value: `{TIMEXPaths.text_article}`"
             self.logger.error(desc)
             raise NoSuchElementException(desc)
+        # via requests
+        elif self.USE_REQUEST_DRIVER:
+            paragraphs = [paragraph.get_text() for paragraph in paragraphs if paragraph.get_text()]
+            return " ".join(paragraphs)
+
+        # via web driver
         else:
             paragraphs[0].text = paragraphs[0].real_element.text.replace('\n', '')
             return " ".join([paragraph.get_text() for paragraph in paragraphs])

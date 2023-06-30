@@ -17,7 +17,7 @@ from scrapers.websites_scrapers.utils.exceptions import FailedGetURLException
 class WebsiteScraperBase:
     USE_REQUEST_DRIVER = bool(os.getenv(key="USE_REQUEST_DRIVER", default=False))
     HEADLESS = bool(os.getenv(key="HEADLESS", default=False))
-
+    
     def __init__(self):
         self._driver = get_scraping_driver(via_request=self.USE_REQUEST_DRIVER, headless=self.HEADLESS)
         self.logger = get_current_logger()
