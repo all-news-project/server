@@ -10,7 +10,6 @@ from db_driver.db_objects.db_objects_utils import get_db_object_from_dict
 from db_driver.utils.consts import DBConsts
 from logger import log_function, get_current_logger
 from nlp_models.nlp_utils.nlp_utils import Nlp_Utils
-from nlp_models.tests.step_test import compare_similarity, compare_texts_tf
 from server_utils.db_utils.article_utils import ArticleUtils
 import pandas as pd
 
@@ -88,23 +87,6 @@ class MyTestCase(unittest.TestCase):
         for a, b in itertools.combinations(input_dict.keys(), 2):
             return_dict[f"{a}:{b}"] = list(itertools.product(input_dict[a], input_dict[b]))
         return return_dict
-
-    @staticmethod
-    def get_similarity_df(sim_dict: dict) -> pd.DataFrame:
-        nlp = Nlp_Utils()
-        df = pd.DataFrame(columns=['compare_sim', 'roberta', 'nlp_compare'])
-        for subject_title, subject_list in sim_dict.items():
-            avg = {'compare_sim': [], 'roberta': [], 'nlp_compare': []}
-            for (article_a, article_b) in subject_list:  # TODO: fix avg finding
-                avg['compare_sim'].append(compare_similarity(article_a.content, article_b.content))
-                avg['compare_text_tf'].append(compare_texts_tf(article_a.content, article_b.content))
-                #avg['roberta'].append(nlp(article_a.content, article_b.content))
-                avg['nlp_compare'].append(nlp._transformers_similarity([article_a.content, article_b.content]))
-            for key in avg.keys():
-                diff = max(avg[key]) - min(avg[key])
-                avg[key] = (sum(avg[key]) / len(avg[key]), diff)
-            df.loc[subject_title] = avg
-        return df
 
     def test_prison_similarity(self):
         artutils = ArticleUtils()
@@ -198,7 +180,8 @@ class MyTestCase(unittest.TestCase):
         # sim = nlp.similarity(nbc.content, bbc.content) 0.96
         # sim= nlp._transformers_similarity([nbc.content, bbc.content]) #0.68
         # sim=_nltk_similarity(nbc.content,bbc.content) # 0.40
-        sim = compare_texts_tf(nbc.content, bbc.content)  # -0.85 , maybe its reversed?
+        sim = nlp.compare_texts(nbc.content,
+                                bbc.content)  # compare_texts_tf(nbc.content, bbc.content)  # -0.85 , maybe its reversed?
         assert sim > 50
 
     def test_syria_russia(self):
@@ -219,7 +202,7 @@ class MyTestCase(unittest.TestCase):
         # sim = nlp.similarity(nbc.content, bbc.content) 0.94
         # sim = nlp._transformers_similarity([nbc.content, bbc.content]) #0.38
         # sim = _nltk_similarity(nbc.content, bbc.content)# 0.099
-        sim = compare_texts_tf(nbc.content, bbc.content)  # -0.51??
+        sim = nlp.compare_texts(nbc.content, bbc.content)  # -0.51??
         assert sim < 50
         k = 5
         logger.info("stop")
