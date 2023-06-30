@@ -35,11 +35,14 @@ class LogDBHandler(logging.Handler):
             data = {
                 "level": record.levelname,
                 "msg": self.format(record),
-                "created": datetime.fromtimestamp(record.created),
-                "task_id": record.task_id,
-                "task_type": record.task_type
+                "created": datetime.fromtimestamp(record.created)
             }
+            if hasattr(record, "task_id"):
+                data.update({"task_id": record.task_id})
+            if hasattr(record, "task_type"):
+                data.update({"task_type": record.task_type})
             log = Log(**data)
             self._insert(log.convert_to_dict())
         except Exception as e:
+            print(e)
             self.handleError(record)
