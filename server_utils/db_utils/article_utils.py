@@ -18,7 +18,7 @@ class ArticleUtils:
     def insert_article(self, article: Article):
         for trie in range(ArticleConsts.TIMES_TRY_INSERT_ARTICLE):
             try:
-                obj_id = self._db.insert_one(table_name=DBConsts.ARTICLE_TABLE_NAME, data=article.convert_to_dict())
+                obj_id = self._db.insert_one(table_name=DBConsts.ARTICLES_TABLE_NAME, data=article.convert_to_dict())
                 self.logger.info(f"Inserted article inserted_id: `{obj_id}`, article_id: `{article.article_id}`")
                 return
             except Exception as e:
@@ -33,7 +33,7 @@ class ArticleUtils:
             try:
                 data_filter = {"article_id": article_id}
                 new_data = {"cluster_id": cluster_id}
-                self._db.update_one(table_name=DBConsts.ARTICLE_TABLE_NAME, data_filter=data_filter, new_data=new_data)
+                self._db.update_one(table_name=DBConsts.ARTICLES_TABLE_NAME, data_filter=data_filter, new_data=new_data)
                 self.logger.info(f"Updated article article_id: `{article_id}`")
                 return
             except Exception as e:
@@ -49,11 +49,11 @@ class ArticleUtils:
             data_filter.update(required_filter_data)
 
         if get_random:
-            articles = self._db.get_many(table_name=DBConsts.ARTICLE_TABLE_NAME, data_filter=data_filter)
+            articles = self._db.get_many(table_name=DBConsts.ARTICLES_TABLE_NAME, data_filter=data_filter)
             article = random.choice(articles)
         else:
             # todo: check the order of the collecting article
-            article = self._db.get_one(table_name=DBConsts.ARTICLE_TABLE_NAME, data_filter=data_filter)
+            article = self._db.get_one(table_name=DBConsts.ARTICLES_TABLE_NAME, data_filter=data_filter)
 
         return Article(**article)
 
@@ -61,7 +61,7 @@ class ArticleUtils:
         article = None
         data_filter = {"article_id": article_id}
         try:
-            article_data = self._db.get_one(table_name=DBConsts.ARTICLE_TABLE_NAME, data_filter=data_filter)
+            article_data = self._db.get_one(table_name=DBConsts.ARTICLES_TABLE_NAME, data_filter=data_filter)
             article_object: Article = get_db_object_from_dict(object_dict=article_data, class_instance=Article)
             article = article_object
         except DataNotFoundDBException as e:
@@ -73,7 +73,7 @@ class ArticleUtils:
         article = None
         data_filter = {"url": article_url}
         try:
-            article_data = self._db.get_one(table_name=DBConsts.ARTICLE_TABLE_NAME, data_filter=data_filter)
+            article_data = self._db.get_one(table_name=DBConsts.ARTICLES_TABLE_NAME, data_filter=data_filter)
             article_object: Article = get_db_object_from_dict(object_dict=article_data, class_instance=Article)
             article = article_object
         except DataNotFoundDBException as e:
@@ -85,7 +85,7 @@ class ArticleUtils:
         # todo: separate this function to: get_articles_by_ids and get_articles_by_urls
         articles: List[Article] = []
         data_filter = {"article_id": {"$in": articles_id}}
-        articles_data = self._db.get_many(table_name=DBConsts.ARTICLE_TABLE_NAME, data_filter=data_filter)
+        articles_data = self._db.get_many(table_name=DBConsts.ARTICLES_TABLE_NAME, data_filter=data_filter)
         for article_data in articles_data:
             articles.append(get_db_object_from_dict(object_dict=article_data, class_instance=Article))
         return articles

@@ -26,7 +26,7 @@ class LogicScaper:
     def _filter_only_not_exits_articles(self, urls: List[str]) -> List[str]:
         data_filter = {"url": {"$in": urls}}
         # todo: also check with `unwanted` tasks status
-        exists_articles = self._db.get_many(table_name=DBConsts.ARTICLE_TABLE_NAME, data_filter=data_filter)
+        exists_articles = self._db.get_many(table_name=DBConsts.ARTICLES_TABLE_NAME, data_filter=data_filter)
         exists_articles_urls = {exists_article.get("url") for exists_article in exists_articles}
         new_articles = list(set(urls).difference(exists_articles_urls))
         return new_articles

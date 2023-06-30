@@ -11,4 +11,4 @@ class NlpConsts:
                             ["0fb4c713-6d23-4b96-9213-a84473d365c4", "d9c22f58-74a8-4d1d-8d69-929c60e2904c"],
                             # syria
                             ["d0ca27f5-2bb7-4724-8d85-1950d8322494"]]  # zelensky
-    DIFFERENCE_LABEL_TOLERANCE=5
+    DIFFERENCE_LABEL_TOLERANCE = 5

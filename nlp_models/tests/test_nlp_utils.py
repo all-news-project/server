@@ -135,7 +135,7 @@ class MyTestCase(unittest.TestCase):
         articles_dict = []
         for articles_id in articles_id:
             articles_dict.append(
-                _db.get_one(table_name=DBConsts.ARTICLE_TABLE_NAME, data_filter={"article_id": articles_id}))
+                _db.get_one(table_name=DBConsts.ARTICLES_TABLE_NAME, data_filter={"article_id": articles_id}))
         articles = [get_db_object_from_dict(article, Article) for article in articles_dict]
         bbc = articles[0]
         nbc = articles[1]
@@ -151,7 +151,7 @@ class MyTestCase(unittest.TestCase):
         articles_dict = []
         for articles_id in articles_id:
             articles_dict.append(
-                _db.get_one(table_name=DBConsts.ARTICLE_TABLE_NAME, data_filter={"article_id": articles_id}))
+                _db.get_one(table_name=DBConsts.ARTICLES_TABLE_NAME, data_filter={"article_id": articles_id}))
         articles = [get_db_object_from_dict(article, Article) for article in articles_dict]
         bbc = articles[0]
         nbc = articles[1]
