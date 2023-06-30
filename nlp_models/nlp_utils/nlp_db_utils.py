@@ -72,7 +72,7 @@
 #         cluster = self._db.get_one(DBConsts.CLUSTER_TABLE_NAME, {"cluster_id": cluster_id})
 #         new_article = self._db.get_one(DBConsts.ARTICLE_TABLE_NAME, {"article_id", new_article_id})
 #         main_article = self._db.get_one(DBConsts.ARTICLE_TABLE_NAME, {"article_id": cluster.main_article_id})
-#         sim_rate = self.nlp_utils.compare_text([main_article.article_content, new_article.content])
+#         sim_rate = self.nlp_utils._transformers_similarity([main_article.article_content, new_article.content])
 #
 #         if sim_rate > 60:
 #             avg_rate = self._check_avg_cluster_sim(cluster, new_article)
@@ -93,6 +93,6 @@
 #         avg_rate = 0
 #         articles = self._db.get_many(DBConsts.ARTICLE_TABLE_NAME, {"article_id": articles_id})
 #         for article in articles:
-#             avg_rate = avg_rate + self.nlp_utils.compare_text([new_article, article.summary])
+#             avg_rate = avg_rate + self.nlp_utils._transformers_similarity([new_article, article.summary])
 #         avg_rate = avg_rate / len(articles)
 #         return avg_rate

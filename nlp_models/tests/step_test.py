@@ -2,11 +2,20 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
+from sentence_transformers import SentenceTransformer, util
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-
+from transformers import AutoModel, AutoTokenizer
 from logger import log_function
+from transformers import pipeline, AutoTokenizer
 
+
+# def try_transformers(text1,text2):
+#     model = SentenceTransformer('stsb-roberta-large')
+#     embedding1 = model.encode(text1, convert_to_tensor=True)
+#     embedding2 = model.encode(text2, convert_to_tensor=True)
+#     cosine_scores = util.pytorch_cos_sim(embedding1, embedding2)
+#     return cosine_scores.item()
 
 def preprocess_text(text):
     # Tokenize the text
@@ -25,11 +34,40 @@ def preprocess_text(text):
 
     return preprocessed_text
 
+
+# model = 'projecte-aina/roberta-base-ca-cased-sts'
+# #model = AutoModel.from_pretrained(model)
+# tokenizer = AutoTokenizer.from_pretrained(model)
+# pipe = pipeline('text-classification', model=model, tokenizer=tokenizer)
+#
+#
+# def prepare(sentence_pairs):
+#     sentence_pairs_prep = []
+#     for s1, s2 in sentence_pairs:
+#         sentence_pairs_prep.append(
+#             f"{tokenizer.cls_token} {s1}{tokenizer.sep_token}{tokenizer.sep_token} {s2}{tokenizer.sep_token}")
+#     return sentence_pairs_prep
+#
+#
+# def rob_sim(text1, text2):
+#     from scipy.special import logit
+#
+#     # sentence_pairs = [("El llibre va caure per la finestra.", "El llibre va sortir volant."),
+#     #                  ("M'agrades.", "T'estimo."),
+#     #                  ("M'agrada el sol i la calor", "A la Garrotxa plou molt.")]
+#
+#     predictions = pipe(prepare([(text1, text2)]), add_special_tokens=False)
+#     return logit(predictions[0]['score'])
+#     # convert back to scores to the original 0 and 5 interval
+#     # for prediction in predictions:
+#     #    prediction['score'] = logit(prediction['score'])
+
+
 @log_function
 def compare_similarity(text1, text2):
-    #nltk.download('stopwords')
-    #nltk.download('punkt')
-    #nltk.download('wordnet')
+    # nltk.download('stopwords')
+    # nltk.download('punkt')
+    # nltk.download('wordnet')
     # Preprocess the texts
     preprocessed_text1 = preprocess_text(text1)
     preprocessed_text2 = preprocess_text(text2)
@@ -51,9 +89,10 @@ article2 = "This is another news article with similar content."
 similarity_score = compare_similarity(article1, article2)
 print(f"Similarity score: {similarity_score}")
 
-
 import tensorflow as tf
 import tensorflow_hub as hub
+
+
 @log_function
 def compare_texts_tf(text1, text2):
     # Load the Universal Sentence Encoder module
