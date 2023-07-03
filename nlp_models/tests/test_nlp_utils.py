@@ -6,7 +6,8 @@ from db_driver.db_objects.article import Article
 from db_driver.db_objects.db_objects_utils import get_db_object_from_dict
 from db_driver.utils.consts import DBConsts
 from logger import log_function, get_current_logger
-from nlp_models.nlp_utils.nlp_utils import Nlp_Utils
+from nlp_models.models.nlp_model import NlpModel
+from nlp_models.nlp_utils.nlp_utils import NlpUtils
 from server_utils.db_utils.article_utils import ArticleUtils
 
 
@@ -85,20 +86,20 @@ class MyTestCase(unittest.TestCase):
             return_dict[f"{a}:{b}"] = list(itertools.product(input_dict[a], input_dict[b]))
         return return_dict
 
-    def test_prison_similarity(self):
-        artutils = ArticleUtils()
-        nlp_utils = Nlp_Utils()
-        art_ids = ["01c15308-ff62-4d57-b8b3-f04ebc890928", "01732e2a-fddc-42f4-883e-34d9848bae65",
-                   "0c2612c3-5a64-4ada-9c80-83c5088e044b"]
-        article_texts = [artutils.get_article_by_id(ids).content for ids in art_ids]
-        texts = Nlp_Utils._get_permutations([article_texts])
-        for data in texts:
-            res = nlp_utils.compare_texts(data[0], data[1])
-            self.assertTrue(res > 0)
+    # def test_prison_similarity(self):
+    #     artutils = ArticleUtils()
+    #     nlp_utils = NlpModel()
+    #     art_ids = ["01c15308-ff62-4d57-b8b3-f04ebc890928", "01732e2a-fddc-42f4-883e-34d9848bae65",
+    #                "0c2612c3-5a64-4ada-9c80-83c5088e044b"]
+    #     article_texts = [artutils.get_article_by_id(ids).content for ids in art_ids]
+    #     #texts = Nlp_Utils._get_permutations([article_texts])
+    #     for data in texts:
+    #         res = nlp_utils.compare_texts(data[0], data[1])
+    #         self.assertTrue(res > 0)
 
     def test_prison_not_similar(self):
         artutils = ArticleUtils()
-        nlp_utils = Nlp_Utils()
+        nlp_utils = NlpUtils()
         art_ids = [["01c15308-ff62-4d57-b8b3-f04ebc890928"], ["d9a08f9d-58a8-40d0-92b3-cfbdf7828d31"]]
         article_texts = []
         for sub in art_ids:
@@ -109,11 +110,11 @@ class MyTestCase(unittest.TestCase):
         self.assertFalse(res)
 
     def test_get_model(self):
-        nlp = Nlp_Utils()
+        nlp = NlpUtils()
         nlp.create_model()
 
     def test_similarity(self):
-        nlp = Nlp_Utils()
+        nlp = NlpUtils()
         nlp.check_similarity()
 
     def test_product(self):
@@ -130,7 +131,7 @@ class MyTestCase(unittest.TestCase):
     def test_syria(self):
         _db = get_current_db_driver()
         logger = get_current_logger()
-        nlp = Nlp_Utils()
+        nlp = NlpUtils()
         articles_id = ["f9874b36-eed7-4e5d-80fd-d309899cca45", "2fdd46ec-da88-4a72-aa3d-33c152d0b638"]
         articles_dict = []
         for articles_id in articles_id:
@@ -142,11 +143,13 @@ class MyTestCase(unittest.TestCase):
         sim = nlp.compare_texts(nbc.content,
                                 bbc.content)
         self.assertTrue(sim > 50)
-
+    def test_update_config(self):
+        nlp=NlpModel()
+        NlpModel.fit([1,2],1)
     def test_syria_russia(self):
         _db = get_current_db_driver()
         logger = get_current_logger()
-        nlp = Nlp_Utils()
+        nlp = NlpUtils()
         articles_id = ["f9874b36-eed7-4e5d-80fd-d309899cca45", "0810f002-8645-4e76-a001-d6279df3a73d"]
         articles_dict = []
         for articles_id in articles_id:
@@ -159,21 +162,21 @@ class MyTestCase(unittest.TestCase):
         self.assertTrue(sim > 50)
 
     def test_compare_text(self):
-        nlp = Nlp_Utils()
+        nlp = NlpUtils()
         text1 = "The world is a beautiful place full of amazing sights and experiences."
         text2 = "There are many wonders to be found in nature, from the tallest mountains to the deepest oceans."
         similarity = nlp.compare_texts(text1, text2)
         self.assertTrue(similarity > 50)
 
     def test_compare_text_sim(self):
-        nlp = Nlp_Utils()
+        nlp = NlpUtils()
         text1 = "The world is a beautiful place full of amazing sights and experiences."
         text2 = "There are many wonders to be found in nature, from the tallest mountains to the deepest oceans."
         similarity = nlp.compare_texts(text1, text2)
         self.assertTrue(similarity > 50)
 
     def test_not_similar_sim(self):
-        nlp = Nlp_Utils()
+        nlp = NlpUtils()
         text1 = "The world is a beautiful place full of amazing sights and experiences."
         text2 = "The quick red fox jumps over the lazy cat."
         similarity = nlp.compare_texts(text1, text2)

@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 
+from db_driver import get_current_db_driver
 from logger import get_current_logger, log_function
 from nlp_models.nlp_utils.consts import NlpConsts
 from server_utils.db_utils.article_utils import ArticleUtils
@@ -26,8 +27,9 @@ class NlpModel:
 
     def __init__(self):
         # todo: @Tal - create new collection called: `models_config` the data: `similar_inputs`, `non_similar_inputs`
-        self.similar_inputs = 9
-        self.non_similar_inputs = 9
+        self._db = get_current_db_driver()
+        self._similar_inputs = 0
+        self._non_similar_inputs = 0
         self.logger = get_current_logger()
         self._model = keras.models.load_model(os.path.join(self.MODELS_FILE_PATH, "models.h5"))
 
@@ -87,9 +89,9 @@ class NlpModel:
 
     @log_function
     def _nltk_similarity(self, text1, text2):
-        nltk.download('stopwords')
-        nltk.download('punkt')
-        nltk.download('wordnet')
+        # nltk.download('stopwords')
+        # nltk.download('punkt')
+        # nltk.download('wordnet')
         # Preprocess the texts
         preprocessed_text1 = self._preprocess_text(text1)
         preprocessed_text2 = self._preprocess_text(text2)
@@ -198,10 +200,27 @@ class NlpModel:
 
     # todo: @Tal implement fit & save - using self.models.fit
     def fit(self, rates: List[float], label: int):
-        pass
+        #self._model.fit(rates, label)
+        if(label==1):
+            self._db.update_one(table_name="models_config",data_filter={"name":"similar_inputs"},new_data={"num":self._similar_inputs+1})
+        elif (label == 0):
+            self._db.update_one(table_name="models_config", data_filter={"name": "non_similar_inputs"},
+                                new_data={"num": self._non_similar_inputs + 1})
 
     def predict(self, rates: List[float]):
-        pass
+        self._similar_inputs = self._db.get_one(table_name="models_config", data_filter={'name': 'similar_inputs'})[
+            'num']
+        self._non_similar_inputs = \
+        self._db.get_one(table_name="models_config", data_filter={'name': 'non_similar_inputs'})['num']
+        res = self._model.predict(rates)[0][0]
+        if res > 0.90 and abs(
+                self.similar_inputs - self.non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
+            self.fit(rates, 1)
+            # self.nlp_model.save("models.h5")
+        elif res < 0.15 and abs(
+                self.similar_inputs - self.non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
+            self.fit(rates, 0)
+        return res
 
     # def check_similarity(self):
     #     artutils = ArticleUtils()

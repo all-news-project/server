@@ -37,13 +37,13 @@ class NlpUtils:
     def compare_texts(self, text1, text2):
         sim_rates = self.nlp_model.get_sim(text1, text2)
         reshaped_value = np.array(sim_rates).reshape(1, 2)
-        res = self.nlp_model.predict(reshaped_value)[0][0]
-        if res > 0.90 and abs(
-                self.nlp_model.similar_inputs - self.nlp_model.non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
-            self.nlp_model.fit(sim_rates, 1)
-            # self.nlp_model.save("models.h5")
-        elif res < 0.15 and abs(
-                self.nlp_model.similar_inputs - self.nlp_model.non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
-            self.nlp_model.fit(sim_rates, 0)
+        res = self.nlp_model.predict(reshaped_value)
+        # if res > 0.90 and abs(
+        #         self.nlp_model.similar_inputs - self.nlp_model.non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
+        #     self.nlp_model.fit(sim_rates, 1)
+        #     # self.nlp_model.save("models.h5")
+        # elif res < 0.15 and abs(
+        #         self.nlp_model.similar_inputs - self.nlp_model.non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
+        #     self.nlp_model.fit(sim_rates, 0)
             # self.nlp_model.save("models.h5")
         return res  # > 0.65
