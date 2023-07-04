@@ -4,10 +4,10 @@ from typing import List
 from bson import ObjectId
 from pymongo import MongoClient
 
-from db_driver.insterfaces.interface_db_driver import DBDriverInterface
-from db_driver.utils.exceptions import InsertDataDBException, DataNotFoundDBException, DeleteDataDBException, \
+from server_utils.db_driver.insterfaces.interface_db_driver import DBDriverInterface
+from server_utils.db_driver.utils.exceptions import InsertDataDBException, DataNotFoundDBException, DeleteDataDBException, \
     UpdateDataDBException
-from logger import get_current_logger, log_function
+from server_utils.logger import get_current_logger, log_function
 from server_utils.db_utils.validation_utils import get_mongodb_connection_string
 
 

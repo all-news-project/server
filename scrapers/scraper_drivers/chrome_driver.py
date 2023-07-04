@@ -6,7 +6,7 @@ from selenium.common import InvalidArgumentException, NoSuchElementException, Ti
 from selenium.webdriver import ActionChains, Keys
 from selenium.webdriver.chrome.options import Options
 
-from logger import get_current_logger, log_function
+from server_utils.logger import get_current_logger, log_function
 from scrapers.scraper_drivers.utils.driver_consts import BrowserConsts, MainConsts
 from scrapers.scraper_drivers.interfaces.base_driver_interface import BaseDriverInterface
 from scrapers.scraper_drivers.utils.driver_utils import get_driver_path, get_temp_browser_profile_path, \

@@ -1,9 +1,9 @@
 from flask import request
 
-from api.server_api import app
-from api.server_api.api_logic import APILogic
-from api.server_api.exceptions import ArticleNotFoundException, NoSimilarArticlesException, GetSimilarArticlesException
-from logger import get_current_logger
+from server_api import app
+from server_api.api_logic import APILogic
+from server_api.exceptions import ArticleNotFoundException, NoSimilarArticlesException, GetSimilarArticlesException
+from server_utils.logger import get_current_logger
 
 
 @app.route('/')

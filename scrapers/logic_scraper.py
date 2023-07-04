@@ -3,10 +3,10 @@ from typing import List, Tuple
 
 from pymongo.errors import ConnectionFailure
 
-from db_driver import get_current_db_driver
-from db_driver.db_objects.task import Task
-from db_driver.utils.consts import DBConsts
-from logger import get_current_logger, log_function
+from server_utils.db_driver import get_current_db_driver
+from server_utils.db_driver.db_objects.task import Task
+from server_utils.db_driver.utils.consts import DBConsts
+from server_utils.logger import get_current_logger, log_function
 from scrapers import websites_scrapers_factory
 from scrapers.websites_scrapers.utils.consts import MainConsts
 from scrapers.websites_scrapers.utils.exceptions import UnwantedArticleException

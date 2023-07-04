@@ -1,9 +1,9 @@
 from datetime import datetime
 from unittest import TestCase
 
-from db_driver import get_current_db_driver
-from db_driver.db_objects.article import Article
-from db_driver.db_objects.db_objects_utils import get_db_object_from_dict
+from server_utils.db_driver import get_current_db_driver
+from server_utils.db_driver.db_objects.article import Article
+from server_utils.db_driver.db_objects.db_objects_utils import get_db_object_from_dict
 
 
 class TestMongoDBDriver(TestCase):

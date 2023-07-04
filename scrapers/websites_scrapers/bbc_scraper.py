@@ -5,7 +5,7 @@ from typing import List, Union
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
-from logger import log_function
+from server_utils.logger import log_function
 from scrapers.websites_scrapers.utils.exceptions import UnwantedArticleException
 from scrapers.websites_scrapers.utils.xpaths import BBCXPaths
 from scrapers.websites_scrapers.website_scraper_base import WebsiteScraperBase

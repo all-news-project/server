@@ -1,4 +1,4 @@
-from logger import get_current_logger
+from server_utils.logger import get_current_logger
 from scrapers.websites_scrapers.bbc_scraper import BBCScraper
 from scrapers.websites_scrapers.time_scraper import TIMEScraper
 from scrapers.websites_scrapers.utils.exceptions import UnknownWebsiteScraperException

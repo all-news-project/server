@@ -4,7 +4,7 @@ from bs4 import Tag
 from lxml.etree import _Element  # todo: change to ElementBase?
 from selenium.webdriver.remote.webelement import WebElement
 
-from logger import get_current_logger, log_function
+from server_utils.logger import get_current_logger, log_function
 from scrapers.scraper_drivers.interfaces.element_interface import ElementInterface
 from scrapers.scraper_drivers.utils.driver_consts import ElementsConsts
 from scrapers.scraper_drivers.utils.exceptions import UnknownElementTypeException
