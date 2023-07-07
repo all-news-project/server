@@ -6,7 +6,7 @@ from db_driver.db_objects.article import Article
 from db_driver.db_objects.db_objects_utils import get_db_object_from_dict
 from db_driver.utils.consts import DBConsts
 from logger import log_function, get_current_logger
-from nlp_models.models.nlp_model import NlpModel
+from nlp_models.model_nlp.model_nlp import NlpModel
 from nlp_models.nlp_utils.nlp_utils import NlpUtils
 from server_utils.db_utils.article_utils import ArticleUtils
 
@@ -143,9 +143,11 @@ class MyTestCase(unittest.TestCase):
         sim = nlp.compare_texts(nbc.content,
                                 bbc.content)
         self.assertTrue(sim > 50)
+
     def test_update_config(self):
-        nlp=NlpModel()
-        NlpModel.fit([1,2],1)
+        nlp = NlpModel()
+        nlp.fit([1, 2], 1)
+
     def test_syria_russia(self):
         _db = get_current_db_driver()
         logger = get_current_logger()

@@ -2,7 +2,7 @@ import os
 import time
 from typing import List
 
-import keras
+from tensorflow import keras
 import nltk
 import numpy as np
 import pandas as pd
@@ -15,6 +15,7 @@ from server_utils.db_utils.article_utils import ArticleUtils
 from server_utils.db_utils.general_utils import get_cartesian_product, get_permutations
 
 from transformers import T5Tokenizer, T5ForConditionalGeneration, DistilBertTokenizer, DistilBertModel
+
 from sentence_transformers import SentenceTransformer
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -26,12 +27,16 @@ class NlpModel:
     MODELS_FILE_PATH = os.getenv(key="MODELS_FILE_PATH", default="./model_files")
 
     def __init__(self):
-        # todo: @Tal - create new collection called: `models_config` the data: `similar_inputs`, `non_similar_inputs`
+        # t=Functional()
+        nltk.download('stopwords')
+        nltk.download('punkt')
+        nltk.download('wordnet')
         self._db = get_current_db_driver()
         self._similar_inputs = 0
         self._non_similar_inputs = 0
         self.logger = get_current_logger()
-        self._model = keras.models.load_model(os.path.join(self.MODELS_FILE_PATH, "models.h5"))
+        self._model_path=(os.path.join(self.MODELS_FILE_PATH, "model_nlp.h5"))
+        self._model = keras.models.load_model(self._model_path)
 
     def _create_model(self):
         import random
@@ -51,18 +56,18 @@ class NlpModel:
         df = new_df.sample(frac=1).reset_index(drop=True)
         x_data = df.drop(columns='label')  # ['data']
         y_data = df['label']
-        model = keras.Sequential([
-            keras.layers.Input(shape=(2)),
+        model = keras.models.Sequential([
+            keras.layers.Input(shape=2),
             keras.layers.Dense(16, activation='relu'),
             keras.layers.Dense(1, activation='sigmoid')
         ])
         model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
         model.fit(x_data, y_data, epochs=10)
-        model.save("models.h5")
+        model.save(self._model_path)
 
     @staticmethod
     def _get_articles_texts(ids_list: list):
-        """This function uses the T5-large models in order to summarize our articles"""
+        """This function uses the T5-large model_nlp in order to summarize our articles"""
         articles_utils = ArticleUtils()
         articles_text = []
         for subject in ids_list:
@@ -144,7 +149,7 @@ class NlpModel:
             f.close()
             return sim_rates  # > 0.65
 
-    """"This function uses the T5 models and tokenizer inorder to encode and decode the text
+    """"This function uses the T5 model_nlp and tokenizer inorder to encode and decode the text
         to get the most important features and summarize the text"""
 
     @log_function
@@ -186,7 +191,7 @@ class NlpModel:
 
     @log_function
     def categorize(self, content: str):
-        """This function uses the DistilBert pretrained models by valurank in order to categorize articles."""
+        """This function uses the DistilBert pretrained model_nlp by valurank in order to categorize articles."""
         tokenizer = DistilBertTokenizer.from_pretrained('finetuned-distilbert-news-article-categorization')
         model = DistilBertModel.from_pretrained("finetuned-distilbert-news-article-categorization")
         encoded_input = tokenizer.encode(content, return_tensors='pt')
@@ -198,33 +203,35 @@ class NlpModel:
         trans_sim = self._transformers_similarity([text1, text2])
         return [nltk_sim, trans_sim]
 
-    # todo: @Tal implement fit & save - using self.models.fit
+    # todo: @Tal implement fit & save - using self.model_nlp.fit
     def fit(self, rates: List[float], label: int):
-        #self._model.fit(rates, label)
-        if(label==1):
+        self._model.fit(rates, label)
+        if label==1:
             self._db.update_one(table_name="models_config",data_filter={"name":"similar_inputs"},new_data={"num":self._similar_inputs+1})
-        elif (label == 0):
+        elif label == 0:
             self._db.update_one(table_name="models_config", data_filter={"name": "non_similar_inputs"},
                                 new_data={"num": self._non_similar_inputs + 1})
+        self._model.save(self._model_path)
 
     def predict(self, rates: List[float]):
+        self._get_model_config()
+        res = self._model.predict(rates)[0][0]
+        if res > 0.90 and abs(
+                self._similar_inputs - self._non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
+            self.fit(rates, 1)
+            # self.nlp_model.save("model_nlp.h5")
+        elif res < 0.15 and abs(
+                self._similar_inputs - self._non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
+            self.fit(rates, 0)
+        return res
+    def _get_model_config(self):
         self._similar_inputs = self._db.get_one(table_name="models_config", data_filter={'name': 'similar_inputs'})[
             'num']
         self._non_similar_inputs = \
         self._db.get_one(table_name="models_config", data_filter={'name': 'non_similar_inputs'})['num']
-        res = self._model.predict(rates)[0][0]
-        if res > 0.90 and abs(
-                self.similar_inputs - self.non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
-            self.fit(rates, 1)
-            # self.nlp_model.save("models.h5")
-        elif res < 0.15 and abs(
-                self.similar_inputs - self.non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
-            self.fit(rates, 0)
-        return res
-
     # def check_similarity(self):
     #     artutils = ArticleUtils()
-    #     models = keras.models.load_model("models.h5")
+    #     model_nlp = keras.model_nlp.load_model("model_nlp.h5")
     #     art_ids = ["01c15308-ff62-4d57-b8b3-f04ebc890928", "01732e2a-fddc-42f4-883e-34d9848bae65",
     #                "0c2612c3-5a64-4ada-9c80-83c5088e044b"]
     #     article_texts = [artutils.get_article_by_id(ids).content for ids in art_ids]
@@ -233,4 +240,4 @@ class NlpModel:
     #     res = []
     #     for data in x_data:
     #         reshaped_value = np.array(data).reshape(1, 2)
-    #         res.append(int(models.predict(reshaped_value)))
+    #         res.append(int(model_nlp.predict(reshaped_value)))

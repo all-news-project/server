@@ -1,8 +1,8 @@
 from typing import List
 
 from logger import get_current_logger, log_function
-from nlp_models.models.nlp_model import NlpModel
-from nlp_models.nlp_utils.consts import NlpConsts
+from nlp_models.model_nlp.model_nlp import NlpModel
+# from model_nlp.nlp_utils.consts import NlpConsts
 import numpy as np
 
 
@@ -41,9 +41,9 @@ class NlpUtils:
         # if res > 0.90 and abs(
         #         self.nlp_model.similar_inputs - self.nlp_model.non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
         #     self.nlp_model.fit(sim_rates, 1)
-        #     # self.nlp_model.save("models.h5")
+        #     # self.nlp_model.save("model_nlp.h5")
         # elif res < 0.15 and abs(
         #         self.nlp_model.similar_inputs - self.nlp_model.non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
         #     self.nlp_model.fit(sim_rates, 0)
-            # self.nlp_model.save("models.h5")
+            # self.nlp_model.save("model_nlp.h5")
         return res  # > 0.65
