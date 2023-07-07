@@ -4,6 +4,7 @@ import os
 class ScraperConsts:
     BBC_HOME_PAGE = "https://www.bbc.com/news/"
     TIME_HOME_PAGE = "https://time.com/"
+    DOMAINS_HOME_PAGE_URLS = {"bbc": BBC_HOME_PAGE, "time": TIME_HOME_PAGE}
 
 
 class BBCConsts:
