@@ -43,7 +43,7 @@ class APILogic:
         # getting cluster
         try:
             cluster_object: Cluster = self._cluster_utils.get_cluster(article_object.cluster_id)
-            articles = self._article_utils.get_articles(articles_id=cluster_object.articles_id)
+            articles: List[Article] = self._article_utils.get_articles(articles_id=cluster_object.articles_id)
 
             # collect needed articles data
             self.server_logger.info(f"Got {len(articles)} similar articles")

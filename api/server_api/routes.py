@@ -1,8 +1,12 @@
+from typing import List
+
 from flask import request, render_template
 
 from server_api import app
 from server_api.api_logic import APILogic
 from server_api.exceptions import ArticleNotFoundException, NoSimilarArticlesException, GetSimilarArticlesException
+
+from server_api.objects.article_api_data import ArticleApiData
 from server_utils.logger import get_current_logger
 
 
@@ -23,7 +27,7 @@ def get_similar_articles():
         try:
             api_logic = APILogic()
             article_url: str = request.args['url']
-            similar_articles_data = api_logic.get_similar_articles_data(article_url=article_url)
+            similar_articles_data: List[ArticleApiData] = api_logic.get_similar_articles_data(article_url=article_url)
             return_data["articles_data"] = similar_articles_data
             return_data["succeeded"] = True
             logger.info(f"Got {len(similar_articles_data)} similar articles")
