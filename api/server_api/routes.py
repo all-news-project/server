@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, render_template
 
 from server_api import app
 from server_api.api_logic import APILogic
@@ -8,8 +8,7 @@ from server_utils.logger import get_current_logger
 
 @app.route('/')
 def index():
-    data = {"url": "all news"}
-    return data
+    return render_template('index.html')
 
 
 @app.route('/get_similar_articles', methods=['POST'])

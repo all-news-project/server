@@ -48,7 +48,14 @@ echo "$image_id" > image_id.txt
 echo "New image id: $image_id"
 
 # Save image
-docker save server_api:"$version" -o ./server_api_"$version"_"$image_id".tar
+# docker save server_api:"$version" -o ./server_api_"$version"_"$image_id".tar
+
+# Getting IP Address
+ip_address=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1' | awk '{print $1}' | sed -n 2p)
+echo "IP address: '$ip_address'"
 
 # Run docker
-docker run -p 5000:5000 "$image_id"
+docker run --network="host" -e CONNECTION_STRING="mongodb://$ip_address:27017/" -p 5000:5000 "$image_id"
+
+# Show current running images
+docker ps
