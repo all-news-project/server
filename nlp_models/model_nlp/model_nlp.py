@@ -43,7 +43,7 @@ class NlpModel:
         texts = self._get_articles_texts(NlpConsts.TRAINING_ARTICLES_ID)
         similar_texts = get_permutations(texts)
         non_similar_texts = get_cartesian_product(texts)
-        non_similar_texts = random.sample(non_similar_texts, self.non_similar_inputs)
+        non_similar_texts = random.sample(non_similar_texts, self._non_similar_inputs)
         x_sim, y_sim = self._get_similarity_data(similar_texts, 1)
         x_non_sim, y_non_sim = self._get_similarity_data(non_similar_texts, 0)
         x_data = x_sim + x_non_sim
