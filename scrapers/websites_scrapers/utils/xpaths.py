@@ -12,3 +12,11 @@ class TIMEXPaths:
     text_article = "//div[@id='article-body']/div/p[not(@class)] | //div[@id='article-body']/div/ul/li"
     articles_elements = "//*[@class='topic-section-wrapper']//ul[contains(@class, 'items')]//li[contains(@id,'item')]//a[@href]"
     popup_close_button = "//*[@id='close_icon']"
+
+
+class CNNXPaths:
+    publishing_time_element = "//div[@class='timestamp']"
+    article_image = "//div[@class='image__picture']//img"
+    articles_elements = "//a[contains(@data-link-type, 'article')]"
+    text_block = "//main[@class='article__main']/p[@class='paragraph inline-placeholder']"
+
