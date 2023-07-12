@@ -4,7 +4,7 @@ from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from logger import log_function
-from scrapers import WebsiteScraperBase
+from scrapers.websites_scrapers.website_scraper_base import WebsiteScraperBase
 from scrapers.websites_scrapers.utils.consts import ScraperConsts, CNNConsts
 from scrapers.websites_scrapers.utils.xpaths import CNNXPaths
 
@@ -55,7 +55,11 @@ class CNNScraper(WebsiteScraperBase):
 
     @log_function
     def _close_popups_if_needed(self):
-        pass
+        if self.USE_REQUEST_DRIVER:
+            return
+
+        self.logger.debug(f"Trying to click close popups if needed")
+        self._try_click_element(by=By.XPATH, value=CNNXPaths.popup_close_button, raise_on_fail=False)
 
     @log_function
     def _extract_article_urls_from_home_page(self) -> List[str]:
@@ -63,14 +67,13 @@ class CNNScraper(WebsiteScraperBase):
         articles_elements = self._driver.find_elements(by=By.XPATH, value=CNNXPaths.articles_elements)
         for element in articles_elements:
             href = element.get_attribute("href")
-            is_url_filter_bad = any([url_filter in href for url_filter in CNNConsts.NEW_ARTICLE_URL_FILTER_UNWANTED
-                                     or url_filter not in href for url_filter in CNNConsts.NEW_ARTICLE_URL_FILTER_WANTED])
-            is_url_filter_good = any([url_filter not in href for url_filter in CNNConsts.NEW_ARTICLE_URL_FILTER_WANTED])
+            is_url_filter_bad = any([url_filter in href for url_filter in CNNConsts.NEW_ARTICLE_URL_FILTER_UNWANTED])
+            is_url_filter_good = any([url_filter in href for url_filter in CNNConsts.NEW_ARTICLE_URL_FILTER_WANTED])
             if is_url_filter_bad or not is_url_filter_good:
                 continue
 
-            if self._homepage_url in href:# and bool(re.search(r'\d', href)):
-                articles_urls.add(href)
+            #if any([homepage_url in href for homepage_url in self._homepage_url]):# and bool(re.search(r'\d', href)):
+            articles_urls.add(href)
         return list(articles_urls)
 
     def get_new_article_urls_from_home_page(self) -> List[str]:
@@ -78,6 +81,6 @@ class CNNScraper(WebsiteScraperBase):
         for home_page in self._homepage_url:
             self._get_page(home_page)
             self._close_popups_if_needed()
-            article_urls.append(*self._extract_article_urls_from_home_page())
+            article_urls.extend(self._extract_article_urls_from_home_page())
         return article_urls
 

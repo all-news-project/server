@@ -5,7 +5,8 @@ class ScraperConsts:
     BBC_HOME_PAGE = "https://www.bbc.com/news/"
     TIME_HOME_PAGE = "https://time.com/"
     CNN_HOME_PAGE = ["https://cnn.com/politics", "https://cnn.com/world"]
-    DOMAINS_HOME_PAGE_URLS = {"bbc": BBC_HOME_PAGE, "time": TIME_HOME_PAGE}
+    CNN_MAIN_PAGE = "https://cnn.com/"
+    DOMAINS_HOME_PAGE_URLS = {"bbc": BBC_HOME_PAGE, "time": TIME_HOME_PAGE, "cnn": CNN_MAIN_PAGE}
 
 
 class BBCConsts:
