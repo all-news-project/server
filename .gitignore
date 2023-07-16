@@ -1,11 +1,13 @@
 .idea/*
-db_driver/cred
+server_utils/db_driver/cred
 venv/
 *_pids.txt
 nlp_models/temp
 scrapers/chromedriver.exe
 __pycache__
-*/integration/api/
+*/integration/server_api_build/
 */integration/scapres/
 */integration/scheduler/
 */integration/nlp_models/
+*.tar
+*/integration/image_id.txt
