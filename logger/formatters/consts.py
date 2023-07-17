@@ -1,5 +1,6 @@
 class MainConsts:
-    CONSOLE_FORMAT = "%(asctime)s | %(levelname)-8s | %(message)s | %(task_type)s | %(task_id)s"
+    SERVER_LOGGER_FORMAT = "%(asctime)s | %(levelname)-8s | %(message)s | %(task_type)s | %(task_id)s"
+    LOGGER_FORMAT = "%(asctime)s | %(levelname)-8s | %(message)s"
     LEVEL_FIELDS = ["levelname", "levelno"]
 
 

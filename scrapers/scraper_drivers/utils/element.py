@@ -11,12 +11,15 @@ from scrapers.scraper_drivers.utils.exceptions import UnknownElementTypeExceptio
 
 
 class Element(ElementInterface):
-    def __init__(self, read_element: Union[Tag, WebElement, _Element]):
+    def __init__(self, read_element: Union[Tag, WebElement, _Element], text: str = None):
         self.logger = get_current_logger()
         self.real_element = read_element
         self.__set_element_type()
+        self.text = text
 
-    @log_function
+    def set_text(self, text: str):
+        self.text = text
+
     def __set_element_type(self):
         if isinstance(self.real_element, Tag):
             self.element_type = ElementsConsts.REQ_ELEMENT
@@ -35,7 +38,7 @@ class Element(ElementInterface):
 
     @log_function
     def get_text(self) -> str:
-        return self.real_element.text
+        return self.text if self.text is not None else self.real_element.text
 
     @log_function
     def get_tag_name(self) -> str:

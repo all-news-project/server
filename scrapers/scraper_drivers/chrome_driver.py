@@ -56,6 +56,9 @@ class ChromeDriver(BaseDriverInterface):
         # Implicitly wait time
         self._driver.implicitly_wait(MainConsts.IMPLICITLY_WAIT_TIME)
 
+        # Page load timeout
+        self._driver.set_page_load_timeout(MainConsts.DEFAULT_PAGE_LOAD_TIMEOUT)
+
         # Maximize the page window
         self._driver.maximize_window()
 
@@ -91,13 +94,15 @@ class ChromeDriver(BaseDriverInterface):
             end_time = datetime.now()
             self.logger.info(f"Init chrome driver in {(end_time - start_time).total_seconds()} seconds")
         except Exception as e:
+            self.logger.error(f"Error initialize chrome driver - {str(e)}")
             if "executable needs to be in path" in str(e).lower():
                 self.logger.error(f"PATH Error")
-            self.logger.error(f"Error initialize chrome driver - {str(e)}")
             if "chromedriver is assuming that chrome has crashed" in str(e).lower():
                 kill_browser_childes(process_name=self.browser_type)
                 self.logger.warning(f"Killed {self.browser_type} childes, run again")
                 return
+            if "current browser version" in str(e).lower():
+                self.logger.error(f"Error with browser version")
             raise e
 
     @log_function
@@ -116,7 +121,7 @@ class ChromeDriver(BaseDriverInterface):
             except InvalidArgumentException:
                 desc = f"Error getting url: '{url}' - invalid url input format, please give full correct format"
                 self.__error_and_exit(desc)
-            except WebDriverException as e:
+            except (WebDriverException, TimeoutException) as e:
                 if "ERR_CONNECTION_RESET" in str(e):
                     continue
                 desc = f"Error getting to page url: `{url}` - {str(e)}"
@@ -141,26 +146,47 @@ class ChromeDriver(BaseDriverInterface):
 
     @log_function
     def find_element(self, by, value) -> Element:
-        return Element(read_element=self._driver.find_element(by=by, value=value))
+        real_element = self._driver.find_element(by=by, value=value)
+        element_text = real_element.text
+        return Element(read_element=real_element, text=element_text)
 
     @log_function
     def find_elements(self, by, value) -> List[Element]:
-        return [Element(read_element=element) for element in self._driver.find_elements(by=by, value=value)]
+        elements: List[Element] = []
+        real_elements = self._driver.find_elements(by=by, value=value)
+        for real_element in real_elements:
+            element = Element(read_element=real_element, text=real_element.text)
+            elements.append(element)
+        return elements
+
+    @log_function
+    def is_element_appears(self, by, value, timeout: int = 0) -> bool:
+        try:
+            self.wait_until_object_appears(by=by, value=value, timeout=timeout)
+            return True
+        except TimeoutException:
+            return False
+        except Exception as e:
+            self.logger.error(f"Error while check if element is appears - {str(e)}")
+            raise e
 
     @log_function
     def wait_until_object_appears(self, by, value, timeout: int = MainConsts.DEFAULT_ELEMENT_TIMEOUT):
         start_time = datetime.now()
         seconds_pass = 0
+        seconds_counter = 0
         while seconds_pass < timeout:
             seconds_pass = (datetime.now() - start_time).total_seconds()
             try:
-                self.logger.debug(f"Waiting for element {value} to appears TIMEOUT: ({seconds_pass}/{timeout})")
+                if seconds_pass > seconds_counter + 1:
+                    self.logger.debug(f"Waiting for element `{value}` to appears timeout: {seconds_pass:.3f}/{timeout}")
                 elements = self._driver.find_elements(by=by, value=value)
                 if not elements:
                     raise NoSuchElementException
                 self.logger.info(f"Element {value} found")
                 return
             except NoSuchElementException:
+                seconds_counter = int(seconds_pass)
                 sleep(MainConsts.ELEMENT_SLEEPING_TIME)
                 continue
         raise TimeoutException
@@ -189,7 +215,8 @@ class ChromeDriver(BaseDriverInterface):
             action.perform()
             self.logger.info(f"Moved to element")
         except Exception as e:
-            self.logger.error(f"Error while trying to move to element - {str(e)}")
+            exception_desc = str(e).split('\n')[0] if str(e) else ''
+            self.logger.warning(f"Error while trying to move to element - {exception_desc}")
 
     @log_function
     def click_on_element(self, by, value):

@@ -1,9 +1,11 @@
 import random
+from typing import List, Union
 
 from db_driver import get_current_db_driver
 from db_driver.db_objects.article import Article
+from db_driver.db_objects.db_objects_utils import get_db_object_from_dict
 from db_driver.utils.consts import DBConsts
-from db_driver.utils.exceptions import InsertDataDBException, UpdateDataDBException
+from db_driver.utils.exceptions import InsertDataDBException, UpdateDataDBException, DataNotFoundDBException
 from logger import get_current_logger
 from server_utils.server_consts import ArticleConsts
 
@@ -54,3 +56,36 @@ class ArticleUtils:
             article = self._db.get_one(table_name=DBConsts.ARTICLE_TABLE_NAME, data_filter=data_filter)
 
         return Article(**article)
+
+    def get_article_by_id(self, article_id: str) -> Union[Article, None]:
+        article = None
+        data_filter = {"article_id": article_id}
+        try:
+            article_data = self._db.get_one(table_name=DBConsts.ARTICLE_TABLE_NAME, data_filter=data_filter)
+            article_object: Article = get_db_object_from_dict(object_dict=article_data, class_instance=Article)
+            article = article_object
+        except DataNotFoundDBException as e:
+            self.logger.warning(f"Error get article by article id: `{article_id}` - {str(e)}")
+        self.logger.info(f"Got article from db, article_id: `{article.article_id}`, url: `{article.url}`")
+        return article
+
+    def get_article_by_url(self, article_url: str) -> Union[Article, None]:
+        article = None
+        data_filter = {"url": article_url}
+        try:
+            article_data = self._db.get_one(table_name=DBConsts.ARTICLE_TABLE_NAME, data_filter=data_filter)
+            article_object: Article = get_db_object_from_dict(object_dict=article_data, class_instance=Article)
+            article = article_object
+        except DataNotFoundDBException as e:
+            self.logger.warning(f"Error get article by article url: `{article_url}` - {str(e)}")
+        self.logger.info(f"Got article from db, article_id: `{article.article_id}`, url: `{article.url}`")
+        return article
+
+    def get_articles(self, articles_id: List[str]) -> List[Article]:
+        # todo: separate this function to: get_articles_by_ids and get_articles_by_urls
+        articles: List[Article] = []
+        data_filter = {"article_id": {"$in": articles_id}}
+        articles_data = self._db.get_many(table_name=DBConsts.ARTICLE_TABLE_NAME, data_filter=data_filter)
+        for article_data in articles_data:
+            articles.append(get_db_object_from_dict(object_dict=article_data, class_instance=Article))
+        return articles

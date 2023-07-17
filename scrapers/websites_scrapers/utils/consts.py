@@ -5,6 +5,7 @@ class ScraperConsts:
     BBC_HOME_PAGE = "https://www.bbc.com/news/"
     TIME_HOME_PAGE = "https://time.com/"
     NBC_HOME_PAGE = "https://www.nbcnews.com/"
+    DOMAINS_HOME_PAGE_URLS = {"bbc": BBC_HOME_PAGE, "time": TIME_HOME_PAGE}
 
 
 class BBCConsts:
@@ -14,6 +15,8 @@ class BBCConsts:
 
 
 class TIMEConsts:
+    TITLE_FILTER = " | Time"
+    PUBLISHING_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
     NEW_ARTICLE_URL_FILTER = []
 
 

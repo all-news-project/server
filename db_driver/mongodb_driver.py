@@ -72,7 +72,7 @@ class MongoDBDriver(DBDriverInterface):
                 return dict(res)
             else:
                 desc = f"Error find data with filter: {data_filter}, table: '{table_name}', db: '{self.DB_NAME}'"
-                self.logger.error(desc)
+                self.logger.warning(desc)
                 raise DataNotFoundDBException(desc)
         except Exception as e:
             self.logger.error(f"Error get one from db - {str(e)}")
@@ -194,7 +194,7 @@ class MongoDBDriver(DBDriverInterface):
             if res:
                 object_id = res.cursor_id
                 self.logger.info(f"Got data from db: '{self.DB_NAME}', table_name: '{table_name}', id: '{object_id}'")
-                return list(dict(res))
+                return list(res)
             else:
                 desc = f"Error find data with filter: {data_filter}, table: '{table_name}', db: '{self.DB_NAME}'"
                 self.logger.warning(desc)
