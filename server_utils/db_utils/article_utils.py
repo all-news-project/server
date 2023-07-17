@@ -70,16 +70,15 @@ class ArticleUtils:
         return article
 
     def get_article_by_url(self, article_url: str) -> Union[Article, None]:
-        article = None
         data_filter = {"url": article_url}
         try:
             article_data = self._db.get_one(table_name=DBConsts.ARTICLE_TABLE_NAME, data_filter=data_filter)
             article_object: Article = get_db_object_from_dict(object_dict=article_data, class_instance=Article)
             article = article_object
+            self.logger.info(f"Got article from db, article_id: `{article.article_id}`, url: `{article.url}`")
+            return article
         except DataNotFoundDBException as e:
             self.logger.warning(f"Error get article by article url: `{article_url}` - {str(e)}")
-        self.logger.info(f"Got article from db, article_id: `{article.article_id}`, url: `{article.url}`")
-        return article
 
     def get_articles(self, articles_id: List[str]) -> List[Article]:
         # todo: separate this function to: get_articles_by_ids and get_articles_by_urls

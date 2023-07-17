@@ -15,7 +15,7 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/get_similar_articles', methods=['POST'])
+@app.route('/get_similar_articles', methods=['GET'])
 def get_similar_articles():
     logger = get_current_logger()
     logger.debug(f"Try getting similar articles")
