@@ -7,7 +7,7 @@ from db_driver.db_objects.article import Article
 from db_driver.db_objects.cluster import Cluster
 from db_driver.db_objects.db_objects_utils import get_db_object_from_dict
 from db_driver.utils.consts import DBConsts
-from db_driver.utils.exceptions import UpdateDataDBException
+from db_driver.utils.exceptions import UpdateDataDBException, DataNotFoundDBException
 from logger import get_current_logger, log_function
 from server_utils.db_utils.article_utils import ArticleUtils
 from server_utils.server_consts import ClusterConsts
@@ -36,6 +36,7 @@ class ClusterUtils:
             cluster: Cluster = Cluster(**cluster_data)
             _id = self._db.insert_one(table_name=DBConsts.CLUSTERS_TABLE_NAME, data=cluster.convert_to_dict())
             self.logger.info(f"Inserted cluster inserted_id: `{_id}`, cluster_id: `{cluster.cluster_id}`")
+            self.article_utils.update_cluster_id(article_id=article.article_id, cluster_id=cluster_data["cluster_id"])
             return _id
         except Exception as e:
             desc = f"Error insert cluster - {str(e)}"
@@ -48,17 +49,20 @@ class ClusterUtils:
         return cluster_object
 
     def get_clusters(self, different_domain: str = None, category: List[str] = None) -> List[Cluster]:
-        clusters: List[Cluster] = list()
-        data_filter = dict()
-        if different_domain:
-            data_filter = {"domains": {"$nin": [different_domain]}}
-        if category:
-            data_filter.update({"categories": {"$in": category}})
-        clusters_dicts = self._db.get_many(table_name=DBConsts.CLUSTERS_TABLE_NAME, data_filter=data_filter)
-        for cluster_dict in clusters_dicts:
-            cluster: Cluster = get_db_object_from_dict(object_dict=cluster_dict, class_instance=Cluster)
-            clusters.append(cluster)
-        return clusters
+        try:
+            clusters: List[Cluster] = list()
+            data_filter = dict()
+            if different_domain:
+                data_filter = {"domains": {"$nin": [different_domain]}}
+            if category:
+                data_filter.update({"categories": {"$in": category}})
+            clusters_dicts = self._db.get_many(table_name=DBConsts.CLUSTERS_TABLE_NAME, data_filter=data_filter)
+            for cluster_dict in clusters_dicts:
+                cluster: Cluster = get_db_object_from_dict(object_dict=cluster_dict, class_instance=Cluster)
+                clusters.append(cluster)
+            return clusters
+        except DataNotFoundDBException:
+            return []
 
     @log_function
     def add_article_to_cluster(self, cluster_id: str, article_id: str, article_domain: str):

@@ -55,7 +55,7 @@ class ArticleUtils:
             # todo: check the order of the collecting article
             article = self._db.get_one(table_name=DBConsts.ARTICLES_TABLE_NAME, data_filter=data_filter)
 
-        return Article(**article)
+        return get_db_object_from_dict(article, class_instance=Article)
 
     def get_article_by_id(self, article_id: str) -> Union[Article, None]:
         article = None

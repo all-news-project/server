@@ -2,7 +2,7 @@ import os
 import time
 from typing import List
 
-from tensorflow import keras
+import keras
 import nltk
 import numpy as np
 import pandas as pd
@@ -21,10 +21,10 @@ from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk import WordNetLemmatizer
 from nltk.corpus import stopwords
-
+# import keras
 
 class NlpModel:
-    MODELS_FILE_PATH = os.getenv(key="MODELS_FILE_PATH", default="./model_files")
+    MODELS_FILE_PATH = os.getenv(key="MODELS_FILE_PATH", default="model_files")
 
     def __init__(self):
         # t=Functional()
@@ -35,8 +35,10 @@ class NlpModel:
         self._similar_inputs = 0
         self._non_similar_inputs = 0
         self.logger = get_current_logger()
-        self._model_path=(os.path.join(self.MODELS_FILE_PATH, "model_nlp.h5"))
-        self._model = keras.models.load_model(self._model_path)
+        self._model_path=(os.path.join(self.MODELS_FILE_PATH, 'nlp_model.h5'))
+        # self._model_path="./model_files/nlp_model.h5"
+        self._model = keras.models.load_model("C:\\Users\\talso\\Desktop\\final project\\server\\nlp_models\\model_nlp\\model_files\\nlp_model.h5")
+        # self._model = keras.models.load_model("nlp_models/model_nlp/nlp_model.h5")
 
     def _create_model(self):
         import random
@@ -216,13 +218,13 @@ class NlpModel:
     def predict(self, rates: List[float]):
         self._get_model_config()
         res = self._model.predict(rates)[0][0]
-        if res > 0.90 and abs(
-                self._similar_inputs - self._non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
-            self.fit(rates, 1)
-            # self.nlp_model.save("model_nlp.h5")
-        elif res < 0.15 and abs(
-                self._similar_inputs - self._non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
-            self.fit(rates, 0)
+        #if res > 0.90 and abs(
+        #        self._similar_inputs - self._non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
+        #    self.fit(rates, 1)
+        #    # self.nlp_model.save("model_nlp.h5")
+        #elif res < 0.15 and abs(
+        #        self._similar_inputs - self._non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
+        #    self.fit(rates, 0)
         return res
     def _get_model_config(self):
         self._similar_inputs = self._db.get_one(table_name="models_config", data_filter={'name': 'similar_inputs'})[
