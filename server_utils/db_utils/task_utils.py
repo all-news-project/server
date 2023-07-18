@@ -1,10 +1,11 @@
 from datetime import datetime
+from typing import List
 from uuid import uuid4
 
+from server_utils.db_driver.db_objects.status_timestamp import StatusTimestamp
 from server_utils.db_driver import get_current_db_driver
 from server_utils.db_driver.db_objects.db_objects_utils import get_db_object_from_dict
 from server_utils.db_driver.db_objects.task import Task
-from server_utils.db_driver.db_objects import StatusTimestamp
 from server_utils.db_driver.utils.consts import DBConsts
 from server_utils.db_driver.utils.exceptions import InsertDataDBException, UpdateDataDBException, DataNotFoundDBException
 from server_utils.logger import get_current_logger, log_function
@@ -69,3 +70,49 @@ class TaskUtils:
             task = self._get_task_by_status(status=status)
             if task:
                 return task
+
+    @log_function
+    def get_unwanted_articles_by_domain(self, domain: str, status: str = None) -> List[Task]:
+        unwanted_articles_in_tasks: List[Task] = list()
+        try:
+            data_filter = {"status": TaskConsts.UNWANTED, "domain": domain}
+            if status:
+                data_filter.update({"status": status})
+            tasks_data = self._db.get_many(table_name=DBConsts.TASKS_TABLE_NAME, data_filter=data_filter)
+            for task in tasks_data:
+                task_object: Task = get_db_object_from_dict(task, Task)
+                unwanted_articles_in_tasks.append(task_object)
+        except Exception as e:
+            self.logger.error(f"Error getting unwanted articles in tasks by domain, {str(e)}")
+        return unwanted_articles_in_tasks
+
+    @log_function
+    def get_tasks_by_url(self, url: str) -> List[Task]:
+        tasks: List[Task] = []
+        try:
+            data_filter = {"url": url}
+            tasks_dict = self._db.get_many(table_name=DBConsts.TASKS_TABLE_NAME, data_filter=data_filter)
+            tasks.extend(self.convert_tasks_dict_to_objects(tasks_dict=tasks_dict))
+        except DataNotFoundDBException:
+            self.logger.warning(f"Didn't find any task by url: `{url}`")
+        return tasks
+
+    @staticmethod
+    def get_task_status_timestamp(task: Task) -> List[StatusTimestamp]:
+        return [StatusTimestamp(**timestamp) for timestamp in task.status_timestamp if type(timestamp) == dict]
+
+    @staticmethod
+    def convert_tasks_dict_to_objects(tasks_dict: List[dict]) -> List[Task]:
+        tasks: List[Task] = []
+        for task_dict in tasks_dict:
+            task_object: Task = get_db_object_from_dict(object_dict=task_dict, class_instance=Task)
+            tasks.append(task_object)
+        return tasks
+
+    @staticmethod
+    def count_amount_failed_task_in_timestamp(status_timestamp: List[StatusTimestamp]) -> int:
+        counter = 0
+        for timestamp in status_timestamp:
+            if timestamp.status == TaskConsts.FAILED:
+                counter += 1
+        return counter

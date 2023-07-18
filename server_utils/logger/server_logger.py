@@ -56,11 +56,11 @@ class ServerLogger(Singleton):
         self.logger.setLevel(level=logging.DEBUG)
 
         self.__task_id = task_id
-        if self.__task_id: # or not hasattr(self.logger, "task_id"):
+        if self.__task_id:  # or not hasattr(self.logger, "task_id"):
             self.logger.__setattr__("task_id", self.__task_id)
 
         self.__task_type = task_type
-        if self.__task_type: # or not hasattr(self.logger, "task_type"):
+        if self.__task_type:  # or not hasattr(self.logger, "task_type"):
             self.logger.__setattr__("task_type", self.__task_type)
 
         if not self.__initialized:

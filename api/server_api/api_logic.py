@@ -1,5 +1,10 @@
 from typing import List
 
+from api.server_api.exceptions import ArticleNotFoundException, NoSimilarArticlesException, GetSimilarArticlesException
+from api.server_api.objects.article_api_data import ArticleApiData
+from db_driver import get_current_db_driver
+from db_driver import Article
+from logger import get_current_logger
 from server_api.exceptions import ArticleNotFoundException, NoSimilarArticlesException, GetSimilarArticlesException
 from server_api.objects.article_api_data import ArticleApiData
 from server_utils.db_driver import get_current_db_driver
@@ -43,7 +48,7 @@ class APILogic:
         # getting cluster
         try:
             cluster_object: Cluster = self._cluster_utils.get_cluster(article_object.cluster_id)
-            articles: List[Article] = self._article_utils.get_articles(articles_id=cluster_object.articles_id)
+            articles = self._article_utils.get_articles(articles_id=cluster_object.articles_id)
 
             # collect needed articles data
             self.server_logger.info(f"Got {len(articles)} similar articles")

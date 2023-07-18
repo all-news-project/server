@@ -14,6 +14,8 @@ from lxml import etree
 
 from typing import List
 
+from server_utils import get_current_logger, log_function
+
 
 class RequestsDriver(BaseDriverInterface):
     def __init__(self, headless: bool = False):
