@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from time import sleep
 from typing import List
@@ -17,6 +18,8 @@ from scrapers.scraper_drivers.utils.element import Element
 
 
 class ChromeDriver(BaseDriverInterface):
+    SLEEP_AFTER_KILLING_CHILD_PROCESS = int(os.getenv(key="SLEEP_AFTER_KILLING_CHILD_PROCESS", default=10))
+
     def __init__(self, browser_type: str = BrowserConsts.CHROME, browser_profile_path: str = None,
                  webdriver_path: str = None, headless: bool = False, quit_at_end: bool = True):
         """
@@ -100,6 +103,7 @@ class ChromeDriver(BaseDriverInterface):
             if "chromedriver is assuming that chrome has crashed" in str(e).lower():
                 kill_browser_childes(process_name=self.browser_type)
                 self.logger.warning(f"Killed {self.browser_type} childes, run again")
+                sleep(self.SLEEP_AFTER_KILLING_CHILD_PROCESS)
                 return
             if "current browser version" in str(e).lower():
                 self.logger.error(f"Error with browser version")

@@ -11,3 +11,8 @@ class FailedGetURLException(Exception):
 class UnwantedArticleException(Exception):
     def __init__(self, msg: str):
         self.msg = msg
+
+
+class FailedConstantlyArticleException(Exception):
+    def __init__(self, msg: str):
+        self.msg = msg
