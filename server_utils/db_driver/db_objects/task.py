@@ -1,8 +1,8 @@
 import datetime
 from dataclasses import dataclass, asdict, field
-from typing import List, Optional, Union
+from typing import List, Union
 
-from db_driver.db_objects.status_timestamp import StatusTimestamp
+from server_utils.db_driver.db_objects.status_timestamp import StatusTimestamp
 
 
 @dataclass

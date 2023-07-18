@@ -3,9 +3,9 @@ from unittest import TestCase
 from uuid import uuid4
 
 from db_driver import get_current_db_driver
-from db_driver.db_objects.db_objects_utils import get_db_object_from_dict
+from server_utils.db_driver.db_objects import get_db_object_from_dict
 from logger import get_current_logger
-from logger.objects.log import Log
+from server_utils.logger.objects.log import Log
 
 
 class TestServerLoggerDB(TestCase):

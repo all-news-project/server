@@ -1,12 +1,13 @@
 import random
 from typing import List, Union
 
-from db_driver import get_current_db_driver
-from db_driver.db_objects.article import Article
-from db_driver.db_objects.db_objects_utils import get_db_object_from_dict
-from db_driver.utils.consts import DBConsts
-from db_driver.utils.exceptions import InsertDataDBException, UpdateDataDBException, DataNotFoundDBException
-from logger import get_current_logger
+from server_utils import get_current_logger
+from server_utils.db_driver import get_current_db_driver
+from server_utils.db_driver.db_objects.article import Article
+from server_utils.db_driver.db_objects.db_objects_utils import get_db_object_from_dict
+from server_utils.db_driver.utils.consts import DBConsts
+from server_utils.db_driver.utils.exceptions import InsertDataDBException, UpdateDataDBException, \
+    DataNotFoundDBException
 from server_utils.server_consts import ArticleConsts
 
 

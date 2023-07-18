@@ -5,11 +5,11 @@ from typing import List, Union
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
-from logger import log_function
 from scrapers.websites_scrapers.utils.exceptions import UnwantedArticleException
 from scrapers.websites_scrapers.utils.xpaths import TIMEXPaths
 from scrapers.websites_scrapers.website_scraper_base import WebsiteScraperBase
 from scrapers.websites_scrapers.utils.consts import ScraperConsts, TIMEConsts
+from server_utils import log_function
 
 
 class TIMEScraper(WebsiteScraperBase):

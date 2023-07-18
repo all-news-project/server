@@ -3,8 +3,8 @@ from typing import List
 from api.server_api.exceptions import ArticleNotFoundException, NoSimilarArticlesException, GetSimilarArticlesException
 from api.server_api.objects.article_api_data import ArticleApiData
 from db_driver import get_current_db_driver
-from db_driver.db_objects.article import Article
-from db_driver.db_objects.cluster import Cluster
+from db_driver import Article
+from server_utils.db_driver.db_objects.cluster import Cluster
 from logger import get_current_logger
 from server_utils.db_utils.article_utils import ArticleUtils
 from server_utils.db_utils.cluster_utils import ClusterUtils

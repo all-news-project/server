@@ -1,10 +1,10 @@
 import os
 from platform import system
 
-from logger import get_current_logger
 from scrapers.scraper_drivers.utils.driver_consts import BrowserConsts
 from scrapers.scraper_drivers.utils.exceptions import UnknownWebDriverException, UnknownOperatingSystemException, \
     UnknownBrowserException
+from server_utils import get_current_logger
 
 
 def get_driver_path(browser_type: str) -> str:
