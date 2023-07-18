@@ -17,7 +17,7 @@ from scrapers.websites_scrapers.utils.exceptions import FailedGetURLException
 class WebsiteScraperBase:
     USE_REQUEST_DRIVER = bool(os.getenv(key="USE_REQUEST_DRIVER", default=False))
     HEADLESS = bool(os.getenv(key="HEADLESS", default=False))
-
+    
     def __init__(self):
         self._driver = get_scraping_driver(via_request=self.USE_REQUEST_DRIVER, headless=self.HEADLESS)
         self.logger = get_current_logger()
@@ -64,6 +64,10 @@ class WebsiteScraperBase:
             raise ErrorClickElementException(f"Failed click in element after {times_to_try + 1} tries")
 
     @log_function
+    def quit_driver(self):
+        self._driver.exit()
+
+    @log_function
     def get_article(self, task: Task) -> Article:
         self._get_page(url=task.url)
         self._check_unwanted_article()
@@ -79,12 +83,14 @@ class WebsiteScraperBase:
             "task_id": task.task_id,
             "images": self._get_article_image_urls()
         }
+        self.quit_driver()
         return Article(**data)
 
     def get_new_article_urls_from_home_page(self) -> List[str]:
         self._get_page(self._homepage_url)
         self._close_popups_if_needed()
         article_urls = self._extract_article_urls_from_home_page()
+        self.quit_driver()
         return article_urls
 
     def _extract_article_urls_from_home_page(self) -> List[str]:

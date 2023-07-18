@@ -89,3 +89,16 @@ class ArticleUtils:
         for article_data in articles_data:
             articles.append(get_db_object_from_dict(object_dict=article_data, class_instance=Article))
         return articles
+
+    def get_articles_by_urls(self, urls: List[str]) -> List[Article]:
+        articles: List[Article] = []
+        data_filter = {"url": {"$in": urls}}
+        try:
+            article_data = self._db.get_many(table_name=DBConsts.ARTICLE_TABLE_NAME, data_filter=data_filter)
+        except DataNotFoundDBException:
+            article_data = []
+
+        for article in article_data:
+            article_object: Article = get_db_object_from_dict(object_dict=article, class_instance=Article)
+            articles.append(article_object)
+        return articles
