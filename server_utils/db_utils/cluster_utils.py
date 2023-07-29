@@ -44,6 +44,13 @@ class ClusterUtils:
         cluster_object: Cluster = get_db_object_from_dict(object_dict=cluster_data, class_instance=Cluster)
         return cluster_object
 
+    def get_all_clusters(self):
+        clusters: List[Article] = list()
+        clusters_data = self._db.get_many(table_name=DBConsts.CLUSTERS_TABLE_NAME, data_filter={})
+        for cluster_data in clusters_data:
+            clusters.append(get_db_object_from_dict(object_dict=cluster_data, class_instance=Cluster))
+        return clusters
+
 
 # For debug
 if __name__ == '__main__':

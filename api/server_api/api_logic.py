@@ -1,6 +1,7 @@
 from typing import List, Tuple
 
-from api.server_api.utils.exceptions import ArticleNotFoundException, NoSimilarArticlesException, GetSimilarArticlesException
+from api.server_api.utils.exceptions import ArticleNotFoundException, NoSimilarArticlesException, \
+    GetSimilarArticlesException
 from api.server_api.objects.article_api_data import ArticleApiData
 from server_utils.db_driver import get_current_db_driver
 from server_utils.db_driver.db_objects.article import Article
