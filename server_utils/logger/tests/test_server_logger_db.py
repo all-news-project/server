@@ -2,9 +2,9 @@ from datetime import datetime
 from unittest import TestCase
 from uuid import uuid4
 
-from db_driver import get_current_db_driver
-from server_utils.db_driver.db_objects import get_db_object_from_dict
-from logger import get_current_logger
+from server_utils.db_driver import get_current_db_driver
+from server_utils.db_driver.db_objects.db_objects_utils import get_db_object_from_dict
+from server_utils.logger import get_current_logger
 from server_utils.logger.objects.log import Log
 
 

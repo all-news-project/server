@@ -1,9 +1,9 @@
+from server_utils.logger import get_current_logger
 from scrapers.websites_scrapers.bbc_scraper import BBCScraper
 from scrapers.websites_scrapers.nbc_scraper import NBCScraper
 from scrapers.websites_scrapers.time_scraper import TIMEScraper
 from scrapers.websites_scrapers.utils.exceptions import UnknownWebsiteScraperException
 from scrapers.websites_scrapers.website_scraper_base import WebsiteScraperBase
-from server_utils import get_current_logger
 
 SCRAPERS = {"bbc": BBCScraper, "time": TIMEScraper, "nbc": NBCScraper}
 

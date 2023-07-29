@@ -4,12 +4,11 @@ from typing import List, Union
 from uuid import uuid4
 
 from selenium.common import TimeoutException
-
+from server_utils.logger import get_current_logger, log_function
 from scrapers.scraper_drivers import get_scraping_driver
 from scrapers.scraper_drivers.utils.exceptions import ErrorClickElementException
 from scrapers.websites_scrapers.utils.consts import MainConsts
 from scrapers.websites_scrapers.utils.exceptions import FailedGetURLException
-from server_utils import get_current_logger, log_function
 from server_utils.db_driver.db_objects.article import Article
 from server_utils.db_driver.db_objects.task import Task
 

@@ -2,14 +2,13 @@ from datetime import datetime
 from typing import List
 from uuid import uuid4
 
-from server_utils import get_current_logger, log_function
+from server_utils.db_driver.db_objects.status_timestamp import StatusTimestamp
 from server_utils.db_driver import get_current_db_driver
 from server_utils.db_driver.db_objects.db_objects_utils import get_db_object_from_dict
-from server_utils.db_driver.db_objects.status_timestamp import StatusTimestamp
 from server_utils.db_driver.db_objects.task import Task
 from server_utils.db_driver.utils.consts import DBConsts
-from server_utils.db_driver.utils.exceptions import InsertDataDBException, UpdateDataDBException, \
-    DataNotFoundDBException
+from server_utils.db_driver.utils.exceptions import InsertDataDBException, UpdateDataDBException, DataNotFoundDBException
+from server_utils.logger import get_current_logger, log_function
 from server_utils.server_consts import TaskConsts
 
 

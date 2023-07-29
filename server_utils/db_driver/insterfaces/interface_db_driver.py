@@ -88,9 +88,9 @@ class DBDriverInterface:
 
     def exists(self, table_name: str, data_filter: dict) -> bool:
         """
-        Check if data is exists in db by data_filter
+        Check if data is existing in db by data_filter
         :param table_name:
         :param data_filter:
-        :return: if the data is exists in table by data filter
+        :return: if the data is existing in table by data filter
         """
         raise NotImplementedError
