@@ -1,11 +1,11 @@
-from db_driver import get_current_db_driver
-from db_driver.db_objects.article import Article
-from db_driver.db_objects.cluster import Cluster
-from db_driver.utils.consts import DBConsts
-from logger import get_current_logger, log_function
+
 from nlp_models.exceptions import SimilarityNotFoundException
 from nlp_models.nlp_utils.nlp_utils import NlpUtils
+from server_utils.db_driver import get_current_db_driver, DBConsts
+from server_utils.db_driver.db_objects.article import Article
+from server_utils.db_driver.db_objects.cluster import Cluster
 from server_utils.db_utils.article_utils import ArticleUtils
+from server_utils.logger import get_current_logger, log_function
 
 
 class ClusterClassifierUtils:
@@ -24,18 +24,12 @@ class ClusterClassifierUtils:
         sim_rate = self.nlp.compare_texts(main_article.content, new_article.content)
         if sim_rate > DBConsts.CLUSTER_HIGH_SIM:
             return sim_rate
-        if sim_rate > DBConsts.CLUSTER_LOW_SIM:
+        elif sim_rate > DBConsts.CLUSTER_LOW_SIM:
             avg_rate = self._check_avg_cluster_sim(cluster.articles_id, new_article)
-            if sim_rate > DBConsts.CLUSTER_HIGH_SIM and avg_rate > DBConsts.CLUSTER_LOW_SIM:
-                self.logger.debug(f"High similarity with article,average {avg_rate}")
-            elif sim_rate > DBConsts.CLUSTER_LOW_SIM and avg_rate > DBConsts.CLUSTER_HIGH_SIM:
-                self.logger.debug(f"Low similarity with article,average {avg_rate}")
-            self.logger.debug(f"similarity rate to cluster is {avg_rate}")
             return avg_rate
         else:
-            desc = f"Error Similarity rate {sim_rate}, Similarity not found"
-            self.logger.debug(f"Similarity not found in {cluster.cluster_id}")
-            raise SimilarityNotFoundException(desc)
+            return 0
+
 
     @log_function
     def _check_avg_cluster_sim(self, article_ids: list[str], new_article: Article) -> float:

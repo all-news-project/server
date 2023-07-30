@@ -8,9 +8,9 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 
-from db_driver import get_current_db_driver
-from logger import get_current_logger, log_function
+
 from nlp_models.nlp_utils.consts import NlpConsts
+from server_utils.db_driver import get_current_db_driver
 from server_utils.db_utils.article_utils import ArticleUtils
 from server_utils.db_utils.general_utils import get_cartesian_product, get_permutations
 
@@ -21,6 +21,10 @@ from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk import WordNetLemmatizer
 from nltk.corpus import stopwords
+
+from server_utils.logger import get_current_logger, log_function
+
+
 # import keras
 
 class NlpModel:

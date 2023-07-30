@@ -1,9 +1,10 @@
 from typing import List
 
-from logger import get_current_logger, log_function
 from nlp_models.model_nlp.model_nlp import NlpModel
 from transformers import AutoTokenizer, LEDConfig, LEDForConditionalGeneration
 import numpy as np
+
+from server_utils.logger import log_function, get_current_logger
 
 
 class NlpUtils:

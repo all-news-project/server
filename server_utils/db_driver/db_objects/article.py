@@ -27,7 +27,7 @@ class Article:
 
     def convert_to_dict_for_json(self) -> dict:
         dict_object = self.convert_to_dict()
-        date_time_attributes = DBObjectsConsts.DATETIME_ATTRIBUTES[DBConsts.ARTICLE_TABLE_NAME]
+        date_time_attributes = DBObjectsConsts.DATETIME_ATTRIBUTES[DBConsts.ARTICLES_TABLE_NAME]
         for attribute_name in date_time_attributes:
             if dict_object[attribute_name]:
                 dict_object[attribute_name] = dict_object[attribute_name].isoformat()

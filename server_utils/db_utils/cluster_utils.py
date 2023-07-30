@@ -7,14 +7,8 @@ from server_utils.db_driver.db_objects.article import Article
 from server_utils.db_driver.db_objects.cluster import Cluster
 from server_utils.db_driver.db_objects.db_objects_utils import get_db_object_from_dict
 from server_utils.db_driver.utils.consts import DBConsts
+from server_utils.db_driver.utils.exceptions import UpdateDataDBException, DataNotFoundDBException
 from server_utils.logger import get_current_logger, log_function
-from db_driver import get_current_db_driver
-from db_driver.db_objects.article import Article
-from db_driver.db_objects.cluster import Cluster
-from db_driver.db_objects.db_objects_utils import get_db_object_from_dict
-from db_driver.utils.consts import DBConsts
-from db_driver.utils.exceptions import UpdateDataDBException, DataNotFoundDBException
-from logger import get_current_logger, log_function
 from server_utils.db_utils.article_utils import ArticleUtils
 from server_utils.server_consts import ClusterConsts
 
