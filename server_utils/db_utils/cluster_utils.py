@@ -47,7 +47,7 @@ class ClusterUtils:
         cluster_data = self._db.get_one(table_name=DBConsts.CLUSTERS_TABLE_NAME, data_filter=data_filter)
         cluster_object: Cluster = get_db_object_from_dict(object_dict=cluster_data, class_instance=Cluster)
         return cluster_object
-
+    @log_function
     def get_clusters(self, different_domain: str = None, category: List[str] = None) -> List[Cluster]:
         try:
             clusters: List[Cluster] = list()

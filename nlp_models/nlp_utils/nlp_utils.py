@@ -2,7 +2,7 @@ from typing import List
 
 from logger import get_current_logger, log_function
 from nlp_models.model_nlp.model_nlp import NlpModel
-# from model_nlp.nlp_utils.consts import NlpConsts
+from transformers import AutoTokenizer, LEDConfig, LEDForConditionalGeneration
 import numpy as np
 
 
@@ -21,6 +21,17 @@ class NlpUtils:
         except Exception as e:
             self.logger.error(f"Failed categorize article")
             raise e
+
+    def summarize(self, content: str) -> str:
+        tokenizer = AutoTokenizer.from_pretrained('allenai/PRIMERA')
+
+        config = LEDConfig.from_pretrained('allenai/PRIMERA')
+
+        model = LEDForConditionalGeneration.from_pretrained('allenai/PRIMERA')
+        input_tokens = tokenizer.encode(content, return_tensors='pt')
+        summary_ids = model.generate(input_tokens, max_length=150, num_beams=4, early_stopping=True)
+        summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+        return summary
 
     @log_function
     def summarize_text(self, content: str) -> str:
@@ -45,5 +56,5 @@ class NlpUtils:
         # elif res < 0.15 and abs(
         #         self.nlp_model.similar_inputs - self.nlp_model.non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
         #     self.nlp_model.fit(sim_rates, 0)
-            # self.nlp_model.save("model_nlp.h5")
+        # self.nlp_model.save("model_nlp.h5")
         return res  # > 0.65
