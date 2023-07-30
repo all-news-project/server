@@ -2,6 +2,12 @@ import uuid
 from datetime import datetime
 from typing import List
 
+from server_utils.db_driver import get_current_db_driver
+from server_utils.db_driver.db_objects.article import Article
+from server_utils.db_driver.db_objects.cluster import Cluster
+from server_utils.db_driver.db_objects.db_objects_utils import get_db_object_from_dict
+from server_utils.db_driver.utils.consts import DBConsts
+from server_utils.logger import get_current_logger, log_function
 from db_driver import get_current_db_driver
 from db_driver.db_objects.article import Article
 from db_driver.db_objects.cluster import Cluster
@@ -80,6 +86,13 @@ class ClusterUtils:
                 continue
         desc = f"Error inserting article into db after {ClusterConsts.TIMES_TRY_UPDATE_CLUSTER} tries"
         raise UpdateDataDBException(desc)
+
+    def get_all_clusters(self):
+        clusters: List[Article] = list()
+        clusters_data = self._db.get_many(table_name=DBConsts.CLUSTERS_TABLE_NAME, data_filter={})
+        for cluster_data in clusters_data:
+            clusters.append(get_db_object_from_dict(object_dict=cluster_data, class_instance=Cluster))
+        return clusters
 
 
 # For debug

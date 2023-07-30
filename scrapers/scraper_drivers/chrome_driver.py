@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from time import sleep
 from typing import List
@@ -6,7 +7,7 @@ from selenium.common import InvalidArgumentException, NoSuchElementException, Ti
 from selenium.webdriver import ActionChains, Keys
 from selenium.webdriver.chrome.options import Options
 
-from logger import get_current_logger, log_function
+from server_utils.logger import get_current_logger, log_function
 from scrapers.scraper_drivers.utils.driver_consts import BrowserConsts, MainConsts
 from scrapers.scraper_drivers.interfaces.base_driver_interface import BaseDriverInterface
 from scrapers.scraper_drivers.utils.driver_utils import get_driver_path, get_temp_browser_profile_path, \
@@ -14,9 +15,12 @@ from scrapers.scraper_drivers.utils.driver_utils import get_driver_path, get_tem
 from selenium import webdriver
 
 from scrapers.scraper_drivers.utils.element import Element
+from server_utils import get_current_logger, log_function
 
 
 class ChromeDriver(BaseDriverInterface):
+    SLEEP_AFTER_KILLING_CHILD_PROCESS = int(os.getenv(key="SLEEP_AFTER_KILLING_CHILD_PROCESS", default=10))
+
     def __init__(self, browser_type: str = BrowserConsts.CHROME, browser_profile_path: str = None,
                  webdriver_path: str = None, headless: bool = False, quit_at_end: bool = True):
         """
@@ -100,6 +104,7 @@ class ChromeDriver(BaseDriverInterface):
             if "chromedriver is assuming that chrome has crashed" in str(e).lower():
                 kill_browser_childes(process_name=self.browser_type)
                 self.logger.warning(f"Killed {self.browser_type} childes, run again")
+                sleep(self.SLEEP_AFTER_KILLING_CHILD_PROCESS)
                 return
             if "current browser version" in str(e).lower():
                 self.logger.error(f"Error with browser version")

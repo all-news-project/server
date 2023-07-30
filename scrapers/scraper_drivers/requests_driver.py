@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
-from logger import get_current_logger, log_function
+from server_utils.logger import get_current_logger, log_function
 from scrapers.scraper_drivers.utils.driver_consts import MainConsts
 from scrapers.scraper_drivers.utils.element import Element
 from scrapers.scraper_drivers.utils.exceptions import PageNotFoundException, AttributeNameException
@@ -13,6 +13,8 @@ from urllib.request import urlopen
 from lxml import etree
 
 from typing import List
+
+from server_utils import get_current_logger, log_function
 
 
 class RequestsDriver(BaseDriverInterface):

@@ -5,10 +5,10 @@ from typing import List, Union
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
-from logger import log_function
 from scrapers.websites_scrapers.utils.xpaths import NBCXPaths
 from scrapers.websites_scrapers.website_scraper_base import WebsiteScraperBase
 from scrapers.websites_scrapers.utils.consts import ScraperConsts, NBCConsts
+from server_utils import log_function
 
 
 class NBCScraper(WebsiteScraperBase):
@@ -21,7 +21,6 @@ class NBCScraper(WebsiteScraperBase):
     def _extract_article_urls_from_home_page(self) -> List[str]:
         articles_urls = set()
         articles_elements = self._driver.find_elements(by=By.XPATH, value=NBCXPaths.articles_elements)
-        unwanted=[]
         for element in articles_elements:
             href = element.get_attribute("href")
             is_url_filter_bad = any([url_filter in href for url_filter in NBCConsts.NEW_ARTICLE_URL_FILTER])
@@ -38,6 +37,7 @@ class NBCScraper(WebsiteScraperBase):
 
     @log_function
     def _get_article_content_text(self) -> str:
+        # todo: fix when using requests driver
         paragraphs = self._driver.find_elements(by=By.XPATH, value=NBCXPaths.text_block)
         if not paragraphs:
             desc = f"Error find content text of article, element value: `{NBCXPaths.text_block}`"

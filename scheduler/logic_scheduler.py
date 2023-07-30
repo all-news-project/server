@@ -3,13 +3,12 @@ from time import sleep
 from db_driver import get_current_db_driver
 from logger import get_current_logger, log_function
 from scrapers.websites_scrapers.utils.consts import ScraperConsts, MainConsts
+from server_utils.db_utils.server_consts import ServerTimeConsts
 from server_utils.db_utils.task_utils import TaskUtils
 
 
 class LogicScheduler:
-    SECONDS = 60
-    MINUTES = 60
-    SEC_TO_SLEEP = SECONDS * MINUTES * 12  # 12 hours
+    SEC_TO_SLEEP = ServerTimeConsts.SECONDS * ServerTimeConsts.MINUTES * 12  # 12 hours
 
     def __init__(self):
         self.logger = get_current_logger()
@@ -37,5 +36,6 @@ class LogicScheduler:
                 self._create_collect_urls_task(url=url, domain=domain)
             domains = ScraperConsts.DOMAINS_HOME_PAGE_URLS.keys()
             self.logger.info(f"Done creating collect urls tasks for domains: `{domains}`")
-            self.logger.warning(f"Start sleeping for {self.SEC_TO_SLEEP / (self.SECONDS * self.MINUTES)} hours")
+            desc = f"sleeping for {self.SEC_TO_SLEEP / (ServerTimeConsts.SECONDS * ServerTimeConsts.MINUTES)} hours"
+            self.logger.warning(desc)
             sleep(self.SEC_TO_SLEEP)

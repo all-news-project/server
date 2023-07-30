@@ -16,3 +16,8 @@ class DeleteDataDBException(Exception):
 class UpdateDataDBException(Exception):
     def __init__(self, msg: str):
         self.msg = msg
+
+
+class ErrorConnectDBException(Exception):
+    def __init__(self, msg: str):
+        self.msg = msg

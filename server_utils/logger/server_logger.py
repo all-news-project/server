@@ -2,9 +2,9 @@ import logging
 import os
 import sys
 
-from logger.formatters.color_formatter import ColorFormatter
-from logger.formatters.consts import MainConsts
-from logger.handlers.log_db_handler import LogDBHandler
+from server_utils.logger.formatters.color_formatter import ColorFormatter
+from server_utils.logger.formatters.consts import MainConsts
+from server_utils.logger.handlers.log_db_handler import LogDBHandler
 from server_utils.singleton_class import Singleton
 
 
@@ -56,11 +56,11 @@ class ServerLogger(Singleton):
         self.logger.setLevel(level=logging.DEBUG)
 
         self.__task_id = task_id
-        if self.__task_id: # or not hasattr(self.logger, "task_id"):
+        if self.__task_id:  # or not hasattr(self.logger, "task_id"):
             self.logger.__setattr__("task_id", self.__task_id)
 
         self.__task_type = task_type
-        if self.__task_type: # or not hasattr(self.logger, "task_type"):
+        if self.__task_type:  # or not hasattr(self.logger, "task_type"):
             self.logger.__setattr__("task_type", self.__task_type)
 
         if not self.__initialized:

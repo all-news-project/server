@@ -11,3 +11,5 @@ __pycache__
 */integration/nlp_models/
 *.tar
 */integration/image_id.txt
+backup/
+git_db/api-data/
