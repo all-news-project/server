@@ -147,7 +147,14 @@ class MyTestCase(unittest.TestCase):
     def test_update_config(self):
         nlp = NlpModel()
         nlp.fit([1, 2], 1)
-
+    def test_summary(self):
+        id="660ac42a-48a8-4e99-8efe-245b37f6777d"
+        _db = get_current_db_driver()
+        article=_db.get_one(table_name=DBConsts.ARTICLES_TABLE_NAME,data_filter={"article_id":id})
+        article=get_db_object_from_dict(article,Article)
+        nlp = NlpUtils()
+        sum=nlp.summarize(article.content)
+        print(sum)
     def test_syria_russia(self):
         _db = get_current_db_driver()
         logger = get_current_logger()
