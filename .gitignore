@@ -5,7 +5,7 @@ venv/
 scrapers/chromedriver.exe
 __pycache__
 */integration/server_api_build/
-*/integration/scapres/
+*/integration/scrapers_build/
 */integration/scheduler/
 */integration/nlp_models/
 *.tar
