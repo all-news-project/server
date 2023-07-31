@@ -1,4 +1,4 @@
-from server_utils.logger import get_current_logger
+from logger import get_current_logger
 from scrapers.websites_scrapers.bbc_scraper import BBCScraper
 from scrapers.websites_scrapers.nbc_scraper import NBCScraper
 from scrapers.websites_scrapers.time_scraper import TIMEScraper

@@ -4,19 +4,20 @@ from typing import List, Union
 from uuid import uuid4
 
 from selenium.common import TimeoutException
-from server_utils.logger import get_current_logger, log_function
+
+from db_driver.db_objects.article import Article
+from db_driver.db_objects.task import Task
+from logger import get_current_logger, log_function
 from scrapers.scraper_drivers import get_scraping_driver
 from scrapers.scraper_drivers.utils.exceptions import ErrorClickElementException
 from scrapers.websites_scrapers.utils.consts import MainConsts
 from scrapers.websites_scrapers.utils.exceptions import FailedGetURLException
-from server_utils.db_driver.db_objects.article import Article
-from server_utils.db_driver.db_objects.task import Task
 
 
 class WebsiteScraperBase:
     USE_REQUEST_DRIVER = bool(os.getenv(key="USE_REQUEST_DRIVER", default=False))
     HEADLESS = bool(os.getenv(key="HEADLESS", default=False))
-    
+
     def __init__(self):
         self._driver = get_scraping_driver(via_request=self.USE_REQUEST_DRIVER, headless=self.HEADLESS)
         self.logger = get_current_logger()

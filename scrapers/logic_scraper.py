@@ -1,16 +1,16 @@
 from time import sleep
 from typing import List, Tuple
 
-from server_utils import get_current_logger, log_function
-from server_utils.db_driver.db_objects.status_timestamp import StatusTimestamp
+from db_driver.db_objects.status_timestamp import StatusTimestamp
+from db_driver.db_objects.task import Task
+from db_utils.article_utils import ArticleUtils
+from db_utils.task_utils import TaskUtils
+from logger import get_current_logger, log_function
 from scrapers import websites_scrapers_factory
 from scrapers.websites_scrapers.utils.consts import MainConsts
 from scrapers.websites_scrapers.utils.exceptions import UnwantedArticleException, FailedConstantlyArticleException, \
     FailedGetURLException
-from server_utils.db_driver.db_objects.task import Task
-from server_utils.db_utils.article_utils import ArticleUtils
-from server_utils.db_utils.task_utils import TaskUtils
-from server_utils.server_consts import ScheduleConsts, TaskConsts
+from server_consts import TaskConsts, ScheduleConsts
 
 
 class LogicScaper:

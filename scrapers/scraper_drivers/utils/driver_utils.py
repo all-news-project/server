@@ -1,7 +1,7 @@
 import os
 from platform import system
 
-from server_utils.logger import get_current_logger
+from logger import get_current_logger
 from scrapers.scraper_drivers.utils.driver_consts import BrowserConsts
 from scrapers.scraper_drivers.utils.exceptions import UnknownWebDriverException, UnknownOperatingSystemException, \
     UnknownBrowserException

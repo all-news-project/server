@@ -1,7 +1,7 @@
 import os
 from git import Repo, GitCommandError
 from git_db.utils.consts import RepoConsts
-from server_utils.logger import get_current_logger
+from logger import get_current_logger
 
 
 class GitHandler:
