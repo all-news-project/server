@@ -4,11 +4,11 @@ from db_driver import get_current_db_driver
 from db_utils.server_consts import ServerTimeConsts
 from db_utils.task_utils import TaskUtils
 from logger import get_current_logger, log_function
-from scrapers.websites_scrapers.utils.consts import ScraperConsts, MainConsts
+from scrapers.web_scraper.websites_scrapers.utils.consts import ScraperConsts, MainConsts
 
 
 class LogicScheduler:
-    SEC_TO_SLEEP = ServerTimeConsts.SECONDS * ServerTimeConsts.MINUTES * 12  # 12 hours
+    SEC_TO_SLEEP = ServerTimeConsts.SECONDS * ServerTimeConsts.MINUTES * 6  # 6 hours
 
     def __init__(self):
         self.logger = get_current_logger()
@@ -27,7 +27,7 @@ class LogicScheduler:
     @log_function
     def run(self):
         """
-        Create collect urls tasks every 12 hours
+        Create collect urls tasks every 6 hours
         :return:
         """
         while True:

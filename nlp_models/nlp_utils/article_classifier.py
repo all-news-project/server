@@ -41,7 +41,7 @@ class ArticleClassifier:
                 max_sim = sim_rate_with_cluster
 
         if max_sim > DBConsts.CLUSTER_THRESHOLD:
-            self.cluster_utils.add_article_to_cluster(match_cluster.cluster_id, article.article_id, article.domain)
+            self.cluster_utils.add_article_to_cluster(cluster=match_cluster, articles=article)
             self.logger.info(f"Added article to cluster {match_cluster.cluster_id}")
         else:
             try:

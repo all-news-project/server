@@ -1,4 +1,4 @@
-from scrapers.scraper_drivers.utils.driver_consts import MainConsts
+from scrapers.web_scraper.scraper_drivers.utils.driver_consts import MainConsts
 
 
 class BaseDriverInterface:
