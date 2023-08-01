@@ -3,13 +3,11 @@ import time
 from typing import List
 
 import keras
-import nltk
 import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 
-
-from nlp_models.nlp_utils.consts import NlpConsts
+from nlp_models.tests.consts import NlpConsts
 from server_utils.db_driver import get_current_db_driver
 from server_utils.db_utils.article_utils import ArticleUtils
 from server_utils.db_utils.general_utils import get_cartesian_product, get_permutations
@@ -28,21 +26,16 @@ from server_utils.logger import get_current_logger, log_function
 # import keras
 
 class NlpModel:
-    MODELS_FILE_PATH = os.getenv(key="MODELS_FILE_PATH", default="model_files")
+    MODELS_FILE_PATH = os.getenv(key="MODELS_FILE_PATH", default="/model_files")
 
     def __init__(self):
-        # t=Functional()
-        nltk.download('stopwords')
-        nltk.download('punkt')
-        nltk.download('wordnet')
         self._db = get_current_db_driver()
         self._similar_inputs = 0
         self._non_similar_inputs = 0
         self.logger = get_current_logger()
-        self._model_path=(os.path.join(self.MODELS_FILE_PATH, 'nlp_model.h5'))
-        # self._model_path="./model_files/nlp_model.h5"
-        self._model = keras.models.load_model("C:\\Users\\talso\\Desktop\\final project\\server\\nlp_models\\model_nlp\\model_files\\nlp_model.h5")
-        # self._model = keras.models.load_model("nlp_models/model_nlp/nlp_model.h5")
+        self._model_path = (os.path.join(self.MODELS_FILE_PATH, 'nlp_model.h5'))
+        #self._model_path= self.MODELS_FILE_PATH+'\\nlp_model.h5'
+        self._model = keras.models.load_model(self._model_path)
 
     def _create_model(self):
         import random
@@ -100,9 +93,6 @@ class NlpModel:
 
     @log_function
     def _nltk_similarity(self, text1, text2):
-        # nltk.download('stopwords')
-        # nltk.download('punkt')
-        # nltk.download('wordnet')
         # Preprocess the texts
         preprocessed_text1 = self._preprocess_text(text1)
         preprocessed_text2 = self._preprocess_text(text2)
@@ -212,8 +202,9 @@ class NlpModel:
     # todo: @Tal implement fit & save - using self.model_nlp.fit
     def fit(self, rates: List[float], label: int):
         self._model.fit(rates, label)
-        if label==1:
-            self._db.update_one(table_name="models_config",data_filter={"name":"similar_inputs"},new_data={"num":self._similar_inputs+1})
+        if label == 1:
+            self._db.update_one(table_name="models_config", data_filter={"name": "similar_inputs"},
+                                new_data={"num": self._similar_inputs + 1})
         elif label == 0:
             self._db.update_one(table_name="models_config", data_filter={"name": "non_similar_inputs"},
                                 new_data={"num": self._non_similar_inputs + 1})
@@ -222,28 +213,10 @@ class NlpModel:
     def predict(self, rates: List[float]):
         self._get_model_config()
         res = self._model.predict(rates)[0][0]
-        #if res > 0.90 and abs(
-        #        self._similar_inputs - self._non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
-        #    self.fit(rates, 1)
-        #    # self.nlp_model.save("model_nlp.h5")
-        #elif res < 0.15 and abs(
-        #        self._similar_inputs - self._non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
-        #    self.fit(rates, 0)
         return res
+
     def _get_model_config(self):
         self._similar_inputs = self._db.get_one(table_name="models_config", data_filter={'name': 'similar_inputs'})[
             'num']
         self._non_similar_inputs = \
-        self._db.get_one(table_name="models_config", data_filter={'name': 'non_similar_inputs'})['num']
-    # def check_similarity(self):
-    #     artutils = ArticleUtils()
-    #     model_nlp = keras.model_nlp.load_model("model_nlp.h5")
-    #     art_ids = ["01c15308-ff62-4d57-b8b3-f04ebc890928", "01732e2a-fddc-42f4-883e-34d9848bae65",
-    #                "0c2612c3-5a64-4ada-9c80-83c5088e044b"]
-    #     article_texts = [artutils.get_article_by_id(ids).content for ids in art_ids]
-    #     texts = self._get_permutations([article_texts])
-    #     x_data, y_data = self._get_similarity_data(texts, 1)
-    #     res = []
-    #     for data in x_data:
-    #         reshaped_value = np.array(data).reshape(1, 2)
-    #         res.append(int(model_nlp.predict(reshaped_value)))
+            self._db.get_one(table_name="models_config", data_filter={'name': 'non_similar_inputs'})['num']

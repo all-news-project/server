@@ -25,12 +25,10 @@ class NlpUtils:
 
     def summarize(self, content: str) -> str:
         tokenizer = AutoTokenizer.from_pretrained('allenai/PRIMERA')
-
         config = LEDConfig.from_pretrained('allenai/PRIMERA')
-
         model = LEDForConditionalGeneration.from_pretrained('allenai/PRIMERA')
         input_tokens = tokenizer.encode(content, return_tensors='pt')
-        summary_ids = model.generate(input_tokens, max_length=150, num_beams=4, early_stopping=True)
+        summary_ids = model.generate(input_tokens, max_length=100, num_beams=8, early_stopping=True)
         summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
         return summary
 
@@ -50,12 +48,4 @@ class NlpUtils:
         sim_rates = self.nlp_model.get_sim(text1, text2)
         reshaped_value = np.array(sim_rates).reshape(1, 2)
         res = self.nlp_model.predict(reshaped_value)
-        # if res > 0.90 and abs(
-        #         self.nlp_model.similar_inputs - self.nlp_model.non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
-        #     self.nlp_model.fit(sim_rates, 1)
-        #     # self.nlp_model.save("model_nlp.h5")
-        # elif res < 0.15 and abs(
-        #         self.nlp_model.similar_inputs - self.nlp_model.non_similar_inputs) < NlpConsts.DIFFERENCE_LABEL_TOLERANCE:
-        #     self.nlp_model.fit(sim_rates, 0)
-        # self.nlp_model.save("model_nlp.h5")
-        return res  # > 0.65
+        return res
