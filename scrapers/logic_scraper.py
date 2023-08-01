@@ -10,7 +10,6 @@ from scrapers import websites_scrapers_factory
 from websites_scrapers.utils.consts import MainConsts
 from websites_scrapers.utils.exceptions import UnwantedArticleException, FailedConstantlyArticleException, \
     FailedGetURLException
-from server_consts import TaskConsts, ScheduleConsts
 
 
 class LogicScaper:

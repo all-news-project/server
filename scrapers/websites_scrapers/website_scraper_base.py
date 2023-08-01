@@ -4,7 +4,6 @@ from typing import List, Union
 from uuid import uuid4
 
 from selenium.common import TimeoutException
-
 from db_driver.db_objects.article import Article
 from db_driver.db_objects.task import Task
 from logger import get_current_logger, log_function
