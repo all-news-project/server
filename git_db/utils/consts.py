@@ -7,6 +7,6 @@ class RepoConsts:
     PASSWORD = os.getenv(key="PASSWORD")
     REPO_NAME = "api-data"
     REPO_URL = f"https://{USERNAME}:{PASSWORD}@github.com/all-news-project/{REPO_NAME}.git"
-    REPO_PATH = f"/home/kfir/Projects/courses_projects/allnews_project/server/git_db/{REPO_NAME}"
+    REPO_PATH = os.getenv(key="REPO_PATH", default=f"/home/user/allnews/server/git_db/{REPO_NAME}")
     REPO_CURRENT_BRANCH = "main"
     REPO_CURRENT_REMOTE = "origin"

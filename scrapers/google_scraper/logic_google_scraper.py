@@ -16,7 +16,7 @@ from logger import get_current_logger, log_function
 from scrapers.google_scraper.utils.consts import GoogleScraperConsts
 from scrapers.google_scraper.utils.xpaths import TrendXPaths
 from scrapers.web_scraper.scraper_drivers import get_scraping_driver
-from server_api.utils.exceptions import ArticleNotFoundException
+from scrapers.web_scraper.websites_scrapers.utils.exceptions import FailedGetArticleException
 
 
 class LogicGoogleScraper:
@@ -27,14 +27,14 @@ class LogicGoogleScraper:
         self._article_utils = ArticleUtils()
         self._cluster_utils = ClusterUtils()
         self._driver = get_scraping_driver(via_request=True)
-        self.googlenews = GoogleNews()
+        self._google_news = GoogleNews()
         self.__set_google_news_language()
         self.__set_google_news_dates()
         self.__set_google_news_encoding()
 
     @log_function
     def __set_google_news_language(self):
-        self.googlenews.set_lang(GoogleScraperConsts.DEFAULT_ARTICLES_LANGUAGE)
+        self._google_news.set_lang(GoogleScraperConsts.DEFAULT_ARTICLES_LANGUAGE)
 
     @log_function
     def __set_google_news_dates(self):
@@ -42,11 +42,11 @@ class LogicGoogleScraper:
         start_time = end_time - timedelta(days=14)
         google_string_start_time = f"{start_time.month}/{start_time.day}/{start_time.year}"
         google_string_end_time = f"{end_time.month}/{end_time.day}/{end_time.year}"
-        self.googlenews.set_time_range(start=google_string_start_time, end=google_string_end_time)
+        self._google_news.set_time_range(start=google_string_start_time, end=google_string_end_time)
 
     @log_function
     def __set_google_news_encoding(self):
-        self.googlenews.set_encode(GoogleScraperConsts.ARTICLES_ENCODING)
+        self._google_news.set_encode(GoogleScraperConsts.ARTICLES_ENCODING)
 
     @staticmethod
     def __clear_trend_text(text: str) -> str:
@@ -95,12 +95,12 @@ class LogicGoogleScraper:
     @log_function
     def _get_google_articles(self, trend: str) -> List[Article]:
         articles: List[Article] = []
-        self.googlenews.search(key=trend)
-        results = self.googlenews.results()
+        self._google_news.search(key=trend)
+        results = self._google_news.results()
 
         if len(results) < GoogleScraperConsts.MIN_RESULTS_FOR_CLUSTER:
             desc = f"Cannot find at list {GoogleScraperConsts.MIN_RESULTS_FOR_CLUSTER} articles for trend: {trend}"
-            raise ArticleNotFoundException(desc)
+            raise FailedGetArticleException(desc)
 
         self.logger.debug(f"Got {len(results)} google articles for trend: `{trend}`")
         for google_article in results:
@@ -110,7 +110,7 @@ class LogicGoogleScraper:
             except Exception as e:
                 desc = f"Error creating article for google result article, except: {str(e)}"
                 self.logger.warning(desc)
-        self.googlenews.clear()
+        self._google_news.clear()
         return articles
 
     @log_function
@@ -147,7 +147,7 @@ class LogicGoogleScraper:
                 try:
                     articles: List[Article] = self._get_google_articles(trend=trend)
                     self.handle_new_google_articles(articles=articles, trend=trend)
-                except ArticleNotFoundException:
+                except FailedGetArticleException:
                     self.logger.warning(f"Error finding articles for trend: `{trend}`")
                     continue
                 except Exception as e:
