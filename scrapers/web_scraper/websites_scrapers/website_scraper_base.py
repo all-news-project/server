@@ -7,10 +7,10 @@ from selenium.common import TimeoutException
 from db_driver.db_objects.article import Article
 from db_driver.db_objects.task import Task
 from logger import get_current_logger, log_function
-from scrapers.scraper_drivers import get_scraping_driver
-from scrapers.scraper_drivers.utils.exceptions import ErrorClickElementException
-from scrapers.websites_scrapers.utils.consts import MainConsts
-from scrapers.websites_scrapers.utils.exceptions import FailedGetURLException
+from scrapers.web_scraper.scraper_drivers import get_scraping_driver
+from scrapers.web_scraper.scraper_drivers.utils.exceptions import ErrorClickElementException
+from scrapers.web_scraper.websites_scrapers.utils.consts import MainConsts
+from scrapers.web_scraper.websites_scrapers.utils.exceptions import FailedGetURLException
 
 
 class WebsiteScraperBase:

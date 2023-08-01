@@ -1,6 +1,6 @@
 from typing import List
 
-from scrapers.scraper_drivers.utils.element import Element
+from scrapers.web_scraper.scraper_drivers.utils.element import Element
 
 
 class BaseDriverInterface:

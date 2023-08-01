@@ -6,13 +6,14 @@ from db_driver.db_objects.task import Task
 from db_utils.article_utils import ArticleUtils
 from db_utils.task_utils import TaskUtils
 from logger import get_current_logger, log_function
-from scrapers import websites_scrapers_factory
+from scrapers.web_scraper import websites_scrapers_factory
+from server_consts import TaskConsts, ScheduleConsts
 from websites_scrapers.utils.consts import MainConsts
 from websites_scrapers.utils.exceptions import UnwantedArticleException, FailedConstantlyArticleException, \
     FailedGetURLException
 
 
-class LogicScaper:
+class LogicWebScaper:
     def __init__(self):
         self.logger = get_current_logger()
         self.task_utils = TaskUtils()
