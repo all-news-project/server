@@ -7,10 +7,12 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 
+from db_driver import get_current_db_driver
+from db_utils.article_utils import ArticleUtils
+from db_utils.general_utils import get_permutations, get_cartesian_product
+from logger import get_current_logger, log_function
 from nlp_models.tests.consts import NlpConsts
-from server_utils.db_driver import get_current_db_driver
-from server_utils.db_utils.article_utils import ArticleUtils
-from server_utils.db_utils.general_utils import get_cartesian_product, get_permutations
+
 
 from transformers import T5Tokenizer, T5ForConditionalGeneration, DistilBertTokenizer, DistilBertModel
 
@@ -20,7 +22,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk import WordNetLemmatizer
 from nltk.corpus import stopwords
 
-from server_utils.logger import get_current_logger, log_function
+
 
 
 # import keras
@@ -199,7 +201,6 @@ class NlpModel:
         trans_sim = self._transformers_similarity([text1, text2])
         return [nltk_sim, trans_sim]
 
-    # todo: @Tal implement fit & save - using self.model_nlp.fit
     def fit(self, rates: List[float], label: int):
         self._model.fit(rates, label)
         if label == 1:

@@ -3,14 +3,14 @@ from time import sleep
 from typing import List
 from nlp_models.nlp_utils.cluster_classifier_utils import ClusterClassifierUtils
 from nlp_models.nlp_utils.nlp_utils import NlpUtils
-from server_utils.db_driver import get_current_db_driver, DBConsts
-from server_utils.db_driver.db_objects.article import Article
-from server_utils.db_driver.db_objects.cluster import Cluster
-from server_utils.db_driver.utils.exceptions import DataNotFoundDBException
-from server_utils.db_utils.article_utils import ArticleUtils
-from server_utils.db_utils.cluster_utils import ClusterUtils
-from server_utils.logger import get_current_logger, log_function
-from server_utils.server_consts import ScheduleConsts
+from db_driver import get_current_db_driver, DBConsts
+from db_driver.db_objects.article import Article
+from db_driver.db_objects.cluster import Cluster
+from db_driver.utils.exceptions import DataNotFoundDBException
+from db_utils.article_utils import ArticleUtils
+from db_utils.cluster_utils import ClusterUtils
+from logger import get_current_logger, log_function
+from server_consts import ScheduleConsts
 
 
 class ArticleClassifier:

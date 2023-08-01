@@ -1,14 +1,13 @@
 import unittest
-import itertools
 
-from server_utils.db_utils.general_utils import get_cartesian_product, get_permutations
+
 from nlp_models.model_nlp.model_nlp import NlpModel
 from nlp_models.nlp_utils.nlp_utils import NlpUtils
-from server_utils.db_driver import get_current_db_driver, DBConsts
-from server_utils.db_driver.db_objects.article import Article
-from server_utils.db_driver.db_objects.db_objects_utils import get_db_object_from_dict
-from server_utils.db_utils.article_utils import ArticleUtils
-from server_utils.logger import log_function, get_current_logger
+from db_driver import get_current_db_driver, DBConsts
+from db_driver.db_objects.article import Article
+from db_driver.db_objects.db_objects_utils import get_db_object_from_dict
+from db_utils.article_utils import ArticleUtils
+from logger import log_function, get_current_logger
 
 
 class MyTestCase(unittest.TestCase):

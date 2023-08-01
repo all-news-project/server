@@ -4,12 +4,12 @@ from typing import List
 
 from git_db.utils.git_handler import GitHandler
 from git_db.utils.json_handler import save_data_to_json
-from server_utils.db_driver.db_objects.article import Article
-from server_utils.db_driver.db_objects.cluster import Cluster
-from server_utils.db_utils.article_utils import ArticleUtils
-from server_utils.db_utils.cluster_utils import ClusterUtils
-from server_utils.db_utils.server_consts import ServerTimeConsts
-from server_utils.logger import get_current_logger, log_function
+from db_driver.db_objects.article import Article
+from db_driver.db_objects.cluster import Cluster
+from db_utils.article_utils import ArticleUtils
+from db_utils.cluster_utils import ClusterUtils
+from db_utils.server_consts import ServerTimeConsts
+from logger import get_current_logger, log_function
 
 
 class LogicGitDB:

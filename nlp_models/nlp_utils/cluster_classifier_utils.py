@@ -1,11 +1,11 @@
 
 from nlp_models.exceptions import SimilarityNotFoundException
 from nlp_models.nlp_utils.nlp_utils import NlpUtils
-from server_utils.db_driver import get_current_db_driver, DBConsts
-from server_utils.db_driver.db_objects.article import Article
-from server_utils.db_driver.db_objects.cluster import Cluster
-from server_utils.db_utils.article_utils import ArticleUtils
-from server_utils.logger import get_current_logger, log_function
+from db_driver import get_current_db_driver, DBConsts
+from db_driver.db_objects.article import Article
+from db_driver.db_objects.cluster import Cluster
+from db_utils.article_utils import ArticleUtils
+from logger import get_current_logger, log_function
 
 
 class ClusterClassifierUtils:

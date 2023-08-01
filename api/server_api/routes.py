@@ -5,7 +5,7 @@ from api.server_api.api_logic import APILogic
 from api.server_api.utils.consts import ServerApiConsts
 from api.server_api.utils.exceptions import ArticleNotFoundException, NoSimilarArticlesException, GetSimilarArticlesException
 
-from server_utils.logger import get_current_logger
+from logger import get_current_logger
 
 
 @app.route('/')
