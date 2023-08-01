@@ -114,6 +114,31 @@ class LogicGoogleScraper:
         return articles
 
     @log_function
+    def handle_new_google_articles(self, articles: List[Article], trend: str):
+        # trend cluster already exists -> add articles to cluster (the ones that not in it)
+        cluster = self._cluster_utils.get_cluster_by_trend(trend=trend)
+        if cluster:
+            for article in articles:
+                if self._article_utils.get_article_by_url(article_url=article.url):
+                    self.logger.warning(f"Article `{article.article_id}` already exists")
+                    continue
+                self._article_utils.insert_article(article=article)
+                self.logger.info(f"Created google article: `{article.title}` -> `{article.article_id}`")
+                self._cluster_utils.add_article_to_cluster(cluster=cluster, article=article)
+        # Create new cluster
+        else:
+            cluster_articles: List[Article] = []
+            for article in articles:
+                if self._article_utils.get_article_by_url(article_url=article.url):
+                    self.logger.warning(f"Article `{article.article_id}` already exists")
+                    continue
+                self._article_utils.insert_article(article=article)
+                cluster_articles.append(article)
+                self.logger.info(f"Created google article: `{article.title}` -> `{article.article_id}`")
+            cluster = self._cluster_utils.create_cluster_from_articles_list(articles=cluster_articles, trend=trend)
+            self.logger.info(f"Created cluster with {len(cluster_articles)} google articles -> `{cluster.cluster_id}`")
+
+    @log_function
     def run(self):
         while True:
             popular_trends = self._get_popular_trends()
@@ -121,11 +146,7 @@ class LogicGoogleScraper:
             for trend in popular_trends:
                 try:
                     articles: List[Article] = self._get_google_articles(trend=trend)
-                    for article in articles:
-                        self._article_utils.insert_article(article=article)
-                        self.logger.info(f"Created google article: `{article.title}` -> `{article.article_id}`")
-                    cluster = self._cluster_utils.create_cluster_from_articles_list(articles=articles, trend=trend)
-                    self.logger.info(f"Created cluster from google articles -> `{cluster.cluster_id}`")
+                    self.handle_new_google_articles(articles=articles, trend=trend)
                 except ArticleNotFoundException:
                     self.logger.warning(f"Error finding articles for trend: `{trend}`")
                     continue
