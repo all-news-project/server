@@ -1,10 +1,10 @@
 from time import sleep
 
 from db_driver import get_current_db_driver
-from logger import get_current_logger, log_function
-from scrapers.websites_scrapers.utils.consts import ScraperConsts, MainConsts
 from db_utils.server_consts import ServerTimeConsts
 from db_utils.task_utils import TaskUtils
+from logger import get_current_logger, log_function
+from scrapers.websites_scrapers.utils.consts import ScraperConsts, MainConsts
 
 
 class LogicScheduler:

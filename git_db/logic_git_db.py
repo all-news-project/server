@@ -2,13 +2,13 @@ from datetime import datetime
 from time import sleep
 from typing import List
 
-from git_db.utils.git_handler import GitHandler
-from git_db.utils.json_handler import save_data_to_json
 from db_driver.db_objects.article import Article
 from db_driver.db_objects.cluster import Cluster
 from db_utils.article_utils import ArticleUtils
 from db_utils.cluster_utils import ClusterUtils
 from db_utils.server_consts import ServerTimeConsts
+from git_db.utils.git_handler import GitHandler
+from git_db.utils.json_handler import save_data_to_json
 from logger import get_current_logger, log_function
 
 
