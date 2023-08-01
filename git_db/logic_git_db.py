@@ -27,6 +27,8 @@ class LogicGitDB:
         self._save_collection_data_into_json_file(collection_data_list=articles, file_name="articles.json")
         clusters = self._cluster_utils.get_all_clusters()
         self._save_collection_data_into_json_file(collection_data_list=clusters, file_name="clusters.json")
+        domains = self._cluster_utils.get_all_domains()
+        save_data_to_json(file_name="domains.json", data=domains)
 
     @log_function
     def _save_collection_data_into_json_file(self, collection_data_list: List[Article | Cluster], file_name: str):
@@ -49,11 +51,10 @@ class LogicGitDB:
             # Update repo files from db
             self.update_git_data_files_from_db()
 
-            # # Save repo into GitHub
+            # Save repo into GitHub
             self._git_handler.save_repo(f"Update {datetime.now()}")
 
             total_seconds = (datetime.now() - start_time).total_seconds()
-
             self.logger.info(f"Done updating git db data, total seconds: {total_seconds}")
             desc = f"sleeping for {self.SEC_TO_SLEEP / (ServerTimeConsts.SECONDS * ServerTimeConsts.MINUTES)} hours"
             self.logger.warning(desc)
