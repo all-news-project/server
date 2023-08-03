@@ -5,18 +5,16 @@ from typing import List
 from uuid import uuid4
 
 from GoogleNews import GoogleNews
-from selenium.webdriver.common.by import By
-
 from db_driver.db_objects.article import Article
 from db_utils.article_utils import ArticleUtils
 from db_utils.cluster_utils import ClusterUtils
-from db_utils.server_consts import ServerTimeConsts
 from db_utils.web_utils import extract_domain_from_url
 from logger import get_current_logger, log_function
 from scrapers.google_scraper.utils.consts import GoogleScraperConsts
-from scrapers.google_scraper.utils.xpaths import TrendXPaths
+from scrapers.google_scraper.utils.trends_utils import TrendUtils
 from scrapers.web_scraper.scraper_drivers import get_scraping_driver
 from scrapers.web_scraper.websites_scrapers.utils.exceptions import FailedGetArticleException
+from server_consts import ServerTimeConsts
 
 
 class LogicGoogleScraper:
@@ -26,6 +24,7 @@ class LogicGoogleScraper:
         self.logger = get_current_logger(task_type="google scraper logic")
         self._article_utils = ArticleUtils()
         self._cluster_utils = ClusterUtils()
+        self._trend_utils = TrendUtils()
         self._driver = get_scraping_driver(via_request=True)
         self._google_news = GoogleNews()
         self.__set_google_news_language()
@@ -48,39 +47,12 @@ class LogicGoogleScraper:
     def __set_google_news_encoding(self):
         self._google_news.set_encode(GoogleScraperConsts.ARTICLES_ENCODING)
 
-    @staticmethod
-    def __clear_trend_text(text: str) -> str:
-        if "(" in text:
-            text = text.split("(")[0]
-        text = text.replace(".", "")
-        text = text.replace("&", "and")
-        text = text.strip()
-        return text
-
-    @staticmethod
-    def __is_trend_text_valid(text: str) -> bool:
-        if text.isnumeric():
-            return False
-        return True
-
-    @log_function
-    def _get_popular_trends(self) -> List[str]:
-        trends: List[str] = []
-        self._driver.get_url(GoogleScraperConsts.TREND_WEBSITE_URL)
-        elements = self._driver.find_elements(by=By.XPATH, value=TrendXPaths.trends_link)
-        for element in elements:
-            text: str = self.__clear_trend_text(element.text)
-            if self.__is_trend_text_valid(text=text):
-                trends.append(text)
-
-        self.logger.info(f"Collected {len(trends)} trends")
-        return trends
-
     def __create_article_from_google_article(self, google_article: dict) -> Article:
         self.logger.debug(google_article)
         data = {
             "article_id": str(uuid4()),
             "url": google_article["link"],
+            "media": google_article["media"],
             "domain": extract_domain_from_url(url=google_article["link"]),
             "title": google_article["title"],
             "content": google_article["desc"],
@@ -141,7 +113,7 @@ class LogicGoogleScraper:
     @log_function
     def run(self):
         while True:
-            popular_trends = self._get_popular_trends()
+            popular_trends = self._trend_utils.get_popular_trends()
             popular_trends = random.sample(popular_trends, GoogleScraperConsts.AMOUNT_SAMPLES_TRENDS)
             for trend in popular_trends:
                 try:

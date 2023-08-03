@@ -1,9 +1,11 @@
 import os
+import random
 from datetime import datetime
 from time import sleep
 from typing import List
 
-from selenium.common import InvalidArgumentException, NoSuchElementException, TimeoutException, WebDriverException
+from selenium.common import InvalidArgumentException, NoSuchElementException, TimeoutException, WebDriverException, \
+    StaleElementReferenceException
 from selenium.webdriver import ActionChains, Keys
 from selenium.webdriver.chrome.options import Options
 
@@ -156,12 +158,15 @@ class ChromeDriver(BaseDriverInterface):
 
     @log_function
     def find_elements(self, by, value) -> List[Element]:
-        elements: List[Element] = []
-        real_elements = self._driver.find_elements(by=by, value=value)
-        for real_element in real_elements:
-            element = Element(read_element=real_element, text=real_element.text)
-            elements.append(element)
-        return elements
+        try:
+            elements: List[Element] = []
+            real_elements = self._driver.find_elements(by=by, value=value)
+            for real_element in real_elements:
+                element = Element(read_element=real_element, text=real_element.text)
+                elements.append(element)
+            return elements
+        except StaleElementReferenceException:
+            return []
 
     @log_function
     def is_element_appears(self, by, value, timeout: int = 0) -> bool:
@@ -200,11 +205,10 @@ class ChromeDriver(BaseDriverInterface):
         try:
             self.click_on_element(by=by, value=value)
             for char in text:
-                ActionChains(self._driver).key_down(char).key_up(char).perform()
-                sleep(MainConsts.INSERT_TEXT_SLEEPING_TIME)
+                self.key_press(char)
             self.logger.info(f"Text: '{text}' inserted to element")
             if press_enter_needed:
-                ActionChains(self._driver).key_down(Keys.ENTER).key_up(Keys.ENTER).perform()
+                self.key_press(Keys.ENTER)
                 self.logger.info("Enter key pressed")
         except Exception as e:
             self.logger.error(f"Error while trying to insert text: '{text}' to element: '{value}' - {str(e)}")
@@ -233,3 +237,33 @@ class ChromeDriver(BaseDriverInterface):
         except Exception as e:
             self.logger.error(f"Error while trying to click element - {str(e)}")
             raise e
+
+    @log_function
+    def is_input_cleared(self, by, value) -> bool:
+        return self.find_element(by=by, value=value).get_attribute("value") == ""
+
+    @log_function
+    def clear_input(self, by, value, timeout: int = MainConsts.CLEAR_ELEMENT_TEXT_TIMEOUT):
+        start_time = datetime.now()
+        while (datetime.now() - start_time).total_seconds() < timeout:
+            if self.is_input_cleared(by=by, value=value):
+                self.logger.info(f"Element is cleared")
+                return
+            self.click_on_element(by=by, value=value)
+            self.multiple_key_press(keys_to_press=[Keys.CONTROL, 'a'])
+            self.key_press(key_to_press=Keys.BACKSPACE)
+        self.logger.warning(f"Error clearing element after {MainConsts.CLEAR_ELEMENT_TEXT_TIMEOUT} timeout")
+
+    def multiple_key_press(self, keys_to_press: List[str]):
+        for key_to_press in keys_to_press:
+            ActionChains(self._driver).key_down(key_to_press).perform()
+            sleep(MainConsts.INSERT_TEXT_SLEEPING_TIME)
+
+        random.shuffle(keys_to_press)
+        for key_to_press in keys_to_press:
+            ActionChains(self._driver).key_up(key_to_press).perform()
+            sleep(MainConsts.INSERT_TEXT_SLEEPING_TIME)
+
+    def key_press(self, key_to_press: str):
+        ActionChains(self._driver).key_down(key_to_press).key_up(key_to_press).perform()
+        sleep(MainConsts.INSERT_TEXT_SLEEPING_TIME)

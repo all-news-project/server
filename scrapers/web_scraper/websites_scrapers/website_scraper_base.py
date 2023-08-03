@@ -75,6 +75,7 @@ class WebsiteScraperBase:
             "article_id": str(uuid4()),
             "url": task.url,
             "domain": task.domain,
+            "media": task.domain,  # todo: Get other media?
             "title": self._get_article_title(),
             "content": self._get_article_content_text(),
             "publishing_time": self._get_article_publishing_time(),

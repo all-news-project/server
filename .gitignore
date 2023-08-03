@@ -13,3 +13,4 @@ scrapers/web_scraper/integration/nlp_models/
 scrapers/web_scraper/integration/image_id.txt
 backup/
 git_db/api-data/
+download/

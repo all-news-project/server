@@ -51,7 +51,7 @@ class RequestsDriver(BaseDriverInterface):
 
     @log_function
     def get_current_url(self) -> str:
-        return self.url
+        return self.url if self.url else None
 
     @log_function
     def get_title(self) -> str:
