@@ -6,10 +6,10 @@ from db_driver.db_objects.article import Article
 from db_driver.db_objects.cluster import Cluster
 from db_utils.article_utils import ArticleUtils
 from db_utils.cluster_utils import ClusterUtils
-from db_utils.server_consts import ServerTimeConsts
 from git_db.utils.git_handler import GitHandler
 from git_db.utils.json_handler import save_data_to_json
 from logger import get_current_logger, log_function
+from server_consts import ServerTimeConsts
 
 
 class LogicGitDB:
@@ -27,8 +27,6 @@ class LogicGitDB:
         self._save_collection_data_into_json_file(collection_data_list=articles, file_name="articles.json")
         clusters = self._cluster_utils.get_all_clusters()
         self._save_collection_data_into_json_file(collection_data_list=clusters, file_name="clusters.json")
-        domains = self._cluster_utils.get_all_domains()
-        save_data_to_json(file_name="domains.json", data=domains)
 
     @log_function
     def _save_collection_data_into_json_file(self, collection_data_list: List[Article | Cluster], file_name: str):

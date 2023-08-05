@@ -1,5 +1,6 @@
 import os
 from platform import system
+from uuid import uuid4
 
 from logger import get_current_logger
 from scrapers.web_scraper.scraper_drivers.utils.driver_consts import BrowserConsts
@@ -42,7 +43,7 @@ def get_temp_browser_profile_path(browser_type: str) -> str:
         path = os.path.join(BrowserConsts.WINDOWS_BROWSER_PATH, browser_type)
     else:
         raise UnknownOperatingSystemException(f"Unknown operating system for run this driver: '{current_os}'")
-    return os.path.join(path, "temp_browser_profile")
+    return os.path.join(path, str(uuid4()))
 
 
 def create_path_if_needed(path: str):
