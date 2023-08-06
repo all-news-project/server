@@ -6,6 +6,7 @@ from db_driver.db_objects.article import Article
 from db_driver.db_objects.cluster import Cluster
 from db_utils.article_utils import ArticleUtils
 from db_utils.cluster_utils import ClusterUtils
+from db_utils.general_db_utils import GeneralDBUtils
 from git_db.utils.git_handler import GitHandler
 from git_db.utils.json_handler import save_data_to_json
 from logger import get_current_logger, log_function
@@ -20,6 +21,7 @@ class LogicGitDB:
         self._git_handler = GitHandler()
         self._article_utils = ArticleUtils()
         self._cluster_utils = ClusterUtils()
+        self._general_db_utils = GeneralDBUtils()
 
     @log_function
     def update_git_data_files_from_db(self):
@@ -27,6 +29,10 @@ class LogicGitDB:
         self._save_collection_data_into_json_file(collection_data_list=articles, file_name="articles.json")
         clusters = self._cluster_utils.get_all_clusters()
         self._save_collection_data_into_json_file(collection_data_list=clusters, file_name="clusters.json")
+        media = self._general_db_utils.get_all_collection_data(table_name="media")
+        for media_data in media:
+            del media_data["_id"]
+        save_data_to_json(file_name="media.json", data=media)
 
     @log_function
     def _save_collection_data_into_json_file(self, collection_data_list: List[Article | Cluster], file_name: str):

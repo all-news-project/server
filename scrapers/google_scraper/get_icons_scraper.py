@@ -1,3 +1,4 @@
+from time import sleep
 from typing import List
 
 from selenium.common import StaleElementReferenceException
@@ -11,14 +12,29 @@ from scrapers.google_scraper.utils.exceptions import GetIconsScraperException
 from scrapers.google_scraper.utils.trends_utils import TrendUtils
 from scrapers.google_scraper.utils.xpaths import IconsScraperXPaths
 from scrapers.web_scraper.scraper_drivers import get_scraping_driver
+from server_consts import ServerTimeConsts
 
 
 class GetIconsScraper:
+    SEC_TO_SLEEP = ServerTimeConsts.SECONDS * ServerTimeConsts.MINUTES * 6  # 6 hours
+
     def __init__(self):
         self.logger = get_current_logger()
         self._db = get_current_db_driver()
-        self._driver = get_scraping_driver(via_request=False)
         self._trend_utils = TrendUtils()
+        self.driver_initialize = False
+        self._init_web_driver()
+
+    @log_function
+    def _init_web_driver(self):
+        if not self.driver_initialize:
+            self._driver = get_scraping_driver(via_request=False)
+            self.driver_initialize = True
+
+    @log_function
+    def _quit(self):
+        self._driver.exit()
+        self.driver_initialize = False
 
     @log_function
     def _get_home_page(self):
@@ -92,13 +108,20 @@ class GetIconsScraper:
 
     @log_function
     def run(self):
-        trends = self._trend_utils.get_popular_trends()
-        get_icons_scraper._get_home_page()
-        for trend in trends:
-            self._search(term=trend)
-            data_list = self._get_icons_from_page()
-            self._save_data(data_list)
-            self._clear_search()
+        while True:
+            self._init_web_driver()
+            trends = self._trend_utils.get_popular_trends()
+            get_icons_scraper._get_home_page()
+            for trend in trends:
+                self._search(term=trend)
+                data_list = self._get_icons_from_page()
+                self._save_data(data_list)
+                self._clear_search()
+            self.logger.info(f"Done collecting google articles")
+            self._quit()
+            desc = f"sleeping for {self.SEC_TO_SLEEP / (ServerTimeConsts.SECONDS * ServerTimeConsts.MINUTES)} hours"
+            self.logger.warning(desc)
+            sleep(self.SEC_TO_SLEEP)
 
 
 if __name__ == '__main__':
