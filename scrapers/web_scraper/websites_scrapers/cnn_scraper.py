@@ -4,9 +4,9 @@ from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from logger import log_function
-from scrapers.websites_scrapers.website_scraper_base import WebsiteScraperBase
-from scrapers.websites_scrapers.utils.consts import ScraperConsts, CNNConsts
-from scrapers.websites_scrapers.utils.xpaths import CNNXPaths
+from scrapers.web_scraper import WebsiteScraperBase
+from scrapers.web_scraper.websites_scrapers.utils.consts import ScraperConsts, CNNConsts
+from scrapers.web_scraper.websites_scrapers.utils.xpaths import CNNXPaths
 
 
 class CNNScraper(WebsiteScraperBase):
