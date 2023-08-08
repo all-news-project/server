@@ -32,6 +32,9 @@ class ArticleClassifier:
         counter = 0
         max_sim = 0
         match_cluster = None
+        article.summary = self.nlp_utils.summarize_text(article.content)
+        self._db.update_one(DBConsts.ARTICLES_TABLE_NAME, {'article_id': article.article_id},
+                            {'summary': article.summary})
         for cluster in clusters:
             self.logger.debug(f"checking similarity in cluster {cluster.cluster_id}")
             sim_rate_with_cluster = self.cluster_nlp.cluster_similarity(cluster, article)

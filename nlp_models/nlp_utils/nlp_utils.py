@@ -23,7 +23,7 @@ class NlpUtils:
             self.logger.error(f"Failed categorize article")
             raise e
 
-    def summarize(self, content: str) -> str:
+    def summarize_PRIMERA(self, content: str) -> str:
         tokenizer = AutoTokenizer.from_pretrained('allenai/PRIMERA')
         config = LEDConfig.from_pretrained('allenai/PRIMERA')
         model = LEDForConditionalGeneration.from_pretrained('allenai/PRIMERA')
@@ -36,10 +36,8 @@ class NlpUtils:
     def summarize_text(self, content: str) -> str:
         try:
             summary = self.nlp_model.summarize_text(content)
-            self.logger.debug("Successfully summarized text")
         except Exception as e:
-            self.logger.error("Failed to summarize text")
-            print(e)
+            self.logger.error(f"Failed to summarize text- {e}")
             summary = None
         return summary
 
