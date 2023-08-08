@@ -17,6 +17,7 @@ from server_consts import ServerTimeConsts
 
 class GetIconsScraper:
     SEC_TO_SLEEP = ServerTimeConsts.SECONDS * ServerTimeConsts.MINUTES * 6  # 6 hours
+    SEC_TO_SLEEP_ON_ERROR = ServerTimeConsts.SECONDS * ServerTimeConsts.MINUTES * 1  # 1 hours
 
     def __init__(self):
         self.logger = get_current_logger()
@@ -109,19 +110,24 @@ class GetIconsScraper:
     @log_function
     def run(self):
         while True:
-            self._init_web_driver()
-            trends = self._trend_utils.get_popular_trends()
-            get_icons_scraper._get_home_page()
-            for trend in trends:
-                self._search(term=trend)
-                data_list = self._get_icons_from_page()
-                self._save_data(data_list)
-                self._clear_search()
-            self.logger.info(f"Done collecting google articles")
-            self._quit()
-            desc = f"sleeping for {self.SEC_TO_SLEEP / (ServerTimeConsts.SECONDS * ServerTimeConsts.MINUTES)} hours"
+            try:
+                self._init_web_driver()
+                trends = self._trend_utils.get_popular_trends()
+                get_icons_scraper._get_home_page()
+                for trend in trends:
+                    self._search(term=trend)
+                    data_list = self._get_icons_from_page()
+                    self._save_data(data_list)
+                    self._clear_search()
+                self.logger.info(f"Done collecting google articles")
+                self._quit()
+                sleep_time = self.SEC_TO_SLEEP
+            except Exception as e:
+                self.logger.error(f"Error run icons scraper, except: {str(e)}")
+                sleep_time = self.SEC_TO_SLEEP_ON_ERROR
+            desc = f"sleeping for {sleep_time / (ServerTimeConsts.SECONDS * ServerTimeConsts.MINUTES)} hours"
             self.logger.warning(desc)
-            sleep(self.SEC_TO_SLEEP)
+            sleep(sleep_time)
 
 
 if __name__ == '__main__':
