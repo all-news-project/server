@@ -72,15 +72,14 @@ class CNNScraper(WebsiteScraperBase):
             if is_url_filter_bad or not is_url_filter_good:
                 continue
 
-            #if any([homepage_url in href for homepage_url in self._homepage_url]):# and bool(re.search(r'\d', href)):
+            # if any([homepage_url in href for homepage_url in self._homepage_url]):# and bool(re.search(r'\d', href)):
             articles_urls.add(href)
         return list(articles_urls)
 
     def get_new_article_urls_from_home_page(self) -> List[str]:
-        article_urls=[]
+        article_urls = []
         for home_page in CNNConsts.CNN_SCRAPE_PAGES:
             self._get_page(home_page)
             self._close_popups_if_needed()
             article_urls.extend(self._extract_article_urls_from_home_page())
         return article_urls
-
