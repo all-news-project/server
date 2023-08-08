@@ -4,8 +4,9 @@ import os
 class ScraperConsts:
     BBC_HOME_PAGE = "https://www.bbc.com/news/"
     TIME_HOME_PAGE = "https://time.com/"
+    CNN_HOME_PAGE = "https://cnn.com/"
     NBC_HOME_PAGE = "https://www.nbcnews.com/"
-    DOMAINS_HOME_PAGE_URLS = {"bbc": BBC_HOME_PAGE, "time": TIME_HOME_PAGE, "nbc": NBC_HOME_PAGE}
+    DOMAINS_HOME_PAGE_URLS = {"bbc": BBC_HOME_PAGE, "time": TIME_HOME_PAGE, "cnn": CNN_HOME_PAGE,"nbc": NBC_HOME_PAGE}
 
 
 class BBCConsts:
@@ -23,6 +24,14 @@ class TIMEConsts:
 class NBCConsts:
     PUBLISHING_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
     NEW_ARTICLE_URL_FILTER = []
+
+
+class CNNConsts:
+    NEW_ARTICLE_URL_FILTER_WANTED = ["/politics/", "/africa/", "/americas/", "/asia/", "/australia/", "/china/",
+                                     "/europe/", "/india/", "/middleeast/", "/uk/"]
+    NEW_ARTICLE_URL_FILTER_UNWANTED = ["/gallery/", "/videos/"]
+    PUBLISHING_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
+    CNN_SCRAPE_PAGES = ["https://cnn.com/politics", "https://cnn.com/world"]
 
 
 class MainConsts:

@@ -23,3 +23,13 @@ class NBCXPaths:
     text_block = f"{text_block_1} | {text_block_2} | {text_block_3}"
     popup_close_button = "//*[@id='close_icon']"
     article_image = "//article//figure//img"
+
+
+
+class CNNXPaths:
+    publishing_time_element = "//div[@class='timestamp']"
+    article_image = "//div[@class='image__picture']//img"
+    articles_elements = "//a[contains(@data-link-type, 'article')]"
+    text_block = "//main[@class='article__main']//p[@data-component-name='paragraph']"
+    popup_close_button="//*[@class='bx-close bx-close-link bx-close-inside']"
+
