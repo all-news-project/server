@@ -56,7 +56,7 @@ class MyTestCase(unittest.TestCase):
             article_obj=get_db_object_from_dict(article, Article)
             article_texts.append(article_obj.content)
         nlp = NlpUtils()
-        #sum=nlp.summarize(article_texts[0])
+        sum=nlp.summarize(article_texts[0])
         sum2=nlp.summarize_text(article_texts[0])
         #sum = nlp.summarize(article.content)
         print(sum)

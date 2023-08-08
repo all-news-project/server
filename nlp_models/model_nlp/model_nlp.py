@@ -13,7 +13,6 @@ from db_utils.general_utils import get_permutations, get_cartesian_product
 from logger import get_current_logger, log_function
 from nlp_models.tests.consts import NlpConsts
 
-
 from transformers import T5Tokenizer, T5ForConditionalGeneration, DistilBertTokenizer, DistilBertModel
 
 from sentence_transformers import SentenceTransformer
@@ -21,8 +20,6 @@ from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk import WordNetLemmatizer
 from nltk.corpus import stopwords
-
-
 
 
 # import keras
@@ -36,7 +33,7 @@ class NlpModel:
         self._non_similar_inputs = 0
         self.logger = get_current_logger()
         self._model_path = (os.path.join(self.MODELS_FILE_PATH, 'nlp_model.h5'))
-        #self._model_path= self.MODELS_FILE_PATH+'\\nlp_model.h5'
+        # self._model_path= self.MODELS_FILE_PATH+'\\nlp_model.h5'
         self._model = keras.models.load_model(self._model_path)
 
     def _create_model(self):
@@ -153,12 +150,13 @@ class NlpModel:
     @log_function
     def __text_sum(self, text: str, model: T5ForConditionalGeneration, tokenizer: T5Tokenizer, num_beams: int = 4,
                    no_repeat_ngram_size: int = 2, min_length: int = 30,
-                   max_length: int = 100,
+                   max_length: int = 200,
                    early_stopping: bool = True) -> str:
         logger = get_current_logger()
         try:
             t5_prepared_text = "summarize: " + text
-            tokenized_text = tokenizer.encode(t5_prepared_text, return_tensors="pt")
+            #tokenizer.model_max_length = 2000
+            tokenized_text = tokenizer.encode(t5_prepared_text, return_tensors="pt",max_length=2000)
             summary_ids = model.generate(tokenized_text,
                                          num_beams=num_beams,
                                          no_repeat_ngram_size=no_repeat_ngram_size,
