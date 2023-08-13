@@ -14,7 +14,7 @@ from server_consts import ServerTimeConsts
 
 
 class LogicGitDB:
-    SEC_TO_SLEEP = ServerTimeConsts.SECONDS * ServerTimeConsts.MINUTES * 6  # 6 hours
+    SEC_TO_SLEEP = ServerTimeConsts.SECONDS * ServerTimeConsts.MINUTES * 12  # 12 hours
 
     def __init__(self):
         self.logger = get_current_logger(task_type="logic_git_db")
